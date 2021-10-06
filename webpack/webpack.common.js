@@ -149,6 +149,7 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
       "@ant-design/icons/lib/dist$": path.resolve(__dirname, "../src/icons.ts"),
+      "@src": path.resolve(__dirname, "../src"),
     },
   },
   plugins: [
