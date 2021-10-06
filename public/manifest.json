@@ -1,0 +1,49 @@
+{
+  "name": "Joy",
+  "short_name": "Remu",
+  "manifest_version": 2,
+  "homepage_url": "https://github.com/krapnikkk/",
+  "icons": {
+    "32": "32x32.png",
+    "64": "64x64.png",
+    "128": "128x128.png",
+    "256": "256x256.png"
+  },
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "cookies",
+    "storage",
+    "clipboardWrite",
+    "unlimitedStorage",
+    "*://*.jd.com/*",
+    "*://.jd.com/*",
+    "activeTab",
+    "tabs"
+  ],
+  "browser_action": {
+    "default_icon": "64x64.png"
+  },
+  "background": {
+    "scripts": [
+      "js/background.bundle.js"
+    ],
+    "persistent": true
+  },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "web_accessible_resources": [
+    "js/inject.bundle.js"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&sceneval=2&ufc=&"
+      ],
+      "js": [
+        "js/content.bundle.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_end"
+    }
+  ]
+}
