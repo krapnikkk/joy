@@ -42,21 +42,21 @@ const getCookie = () => {
             if (ck) {
                 // 校验ck有效性
                 getUserInfo(ck).then((res: Object) => {
-                    Object.assign(res, { cookie: ck,createDate:Date.now() });
+                    Object.assign(res, { cookie: ck, createDate: Date.now() });
                     let curPin: string = res['curPin'];
                     localStoragePromise.get("account").then((storage: any) => {
-                        let { account } = storage;
+                        let account = storage.account||{};
                         if (account[curPin]) {
                             console.log("覆盖");
                         }
                         account[curPin] = res;
                         localStoragePromise.set({
                             account
-                        }).then(()=>{
+                        }).then(() => {
                             postChromeMessage({ type: GET_COOKIES_SUCCESS });
                         });
                     });
-                    
+
                 }).catch((e) => {
                     console.warn(e);
                     // todo
