@@ -1,6 +1,6 @@
 {
   "name": "Joy",
-  "short_name": "Remu",
+  "short_name": "Joy",
   "manifest_version": 2,
   "homepage_url": "https://github.com/krapnikkk/",
   "icons": {
@@ -10,16 +10,14 @@
     "256": "256x256.png"
   },
   "permissions": [
+    "alarms",
+    "cookies",
     "webRequest",
     "webRequestBlocking",
-    "cookies",
     "storage",
     "clipboardWrite",
-    "unlimitedStorage",
     "*://*.jd.com/*",
-    "*://.jd.com/*",
-    "activeTab",
-    "tabs"
+    "*://.jd.com/*"
   ],
   "browser_action": {
     "default_icon": "64x64.png"
@@ -30,7 +28,7 @@
     ],
     "persistent": true
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://hm.baidu.com 'unsafe-inline'; object-src 'self'",
   "web_accessible_resources": [
     "js/inject.bundle.js"
   ],
