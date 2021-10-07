@@ -12,7 +12,7 @@ interface IState {
 interface IProps {
 }
 
-export default class AccountComponent extends React.Component<IProps, IState, {}> {
+export default class Account extends React.Component<IProps, IState, {}> {
   constructor(props: IProps | Readonly<IProps>) {
     super(props);
     this.state = {
