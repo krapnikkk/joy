@@ -1,34 +1,38 @@
-import { Avatar, Button, List, message, PageHeader, Tooltip } from 'antd';
+import { Avatar, Button, Input, List, message, PageHeader, Tooltip } from 'antd';
 import * as React from 'react'
 import './Account.css';
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import { QuestionCircleOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { AUTO_GET_COOKIES, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
-const data = [
-  {
-    title: 'Ant Design Title 1',
-  },
-  {
-    title: 'Ant Design Title 2',
-  },
-  {
-    title: 'Ant Design Title 3',
-  },
-  {
-    title: 'Ant Design Title 4',
-  },
-];
+import { copyText, localStoragePromise } from '@src/utils';
+import { IAccount } from '@src/@types';
 
-export default class AccountComponent extends React.Component {
-  public componentDidMount() {
-    console.log("componentDidMount");
+interface IState {
+  accountInfo: IAccount[];
+}
+interface IProps {
+}
+
+export default class AccountComponent extends React.Component<IProps, IState, {}> {
+  constructor(props: IProps | Readonly<IProps>) {
+    super(props);
+    this.state = {
+      accountInfo: []
+    };
     this.addEvent();
+    this.getAccountInfoAsync();
   }
+
+  public componentDidMount() {
+    // console.log("componentDidMount");
+  }
+
 
   addEvent() {
     chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
       console.log(request);
       switch (request.type) {
         case GET_COOKIES_SUCCESS:
+          this.getAccountInfoAsync(false);
           message.success('获取cookies成功！');
           break;
         default:
@@ -38,6 +42,7 @@ export default class AccountComponent extends React.Component {
     });
   }
 
+
   render() {
     return (
       <section className="Account">
@@ -45,7 +50,7 @@ export default class AccountComponent extends React.Component {
           title="账号管理"
           className="site-page-header"
           extra={[
-            <Button key="1" onClick={this.autoGetCK.bind(this)}>
+            <Button key="0" onClick={this.autoGetCK.bind(this)}>
               自动获取
               <Tooltip
                 placement="bottom"
@@ -53,7 +58,7 @@ export default class AccountComponent extends React.Component {
               ><QuestionCircleOutlined />
               </Tooltip>
             </Button>,
-            <Button key="2" onClick={this.login.bind(this)}>
+            <Button key="1" onClick={this.login.bind(this)}>
               添加账号
               <Tooltip
                 placement="bottom"
@@ -61,7 +66,15 @@ export default class AccountComponent extends React.Component {
               ><QuestionCircleOutlined />
               </Tooltip>
             </Button>,
-            <Button key="3">
+            <Button key="2" onClick={this.clearAllCookie.bind(this)}>
+              清空列表
+              <Tooltip
+                placement="bottom"
+                title="清空缓存下的所有cookie信息"
+              ><QuestionCircleOutlined />
+              </Tooltip>
+            </Button>,
+            <Button key="3" disabled>
               文本导入
               <Tooltip
                 placement="bottom"
@@ -69,7 +82,7 @@ export default class AccountComponent extends React.Component {
               ><QuestionCircleOutlined />
               </Tooltip>
             </Button>,
-            <Button key="4">
+            <Button key="4" disabled>
               文本导出
               <Tooltip
                 placement="bottom"
@@ -77,7 +90,7 @@ export default class AccountComponent extends React.Component {
               ><QuestionCircleOutlined />
               </Tooltip>
             </Button>,
-            <Button key="5">
+            <Button key="5" disabled>
               一键更新
               <Tooltip
                 placement="bottom"
@@ -91,13 +104,19 @@ export default class AccountComponent extends React.Component {
         <List
           itemLayout="horizontal"
           split={true}
-          dataSource={data}
-          renderItem={item => (
-            <List.Item actions={[<a key="list-update">更新</a>, <a key="list-delete">删除</a>]}>
+          dataSource={this.state.accountInfo}
+          renderItem={(item, index) => (
+            // <List.Item actions={[<a key="list-update">更新</a>, <a key="list-delete">删除</a>]}>this.copyText()
+            <List.Item actions={[<a key="list-copy" onClick={this.copyText.bind(this, index)}>复制</a>, <a key="list-delete" onClick={this.deleteCookie.bind(this, index)}>删除</a>]}>
               <List.Item.Meta
-                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                title={<a href="https://ant.design">{item.title}</a>}
-                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                avatar={<Avatar src={item.headImageUrl} />}
+                title={<>昵称：{item.nickname}</>}
+                description={<>cookie:
+                  <Input.Password
+                    value={item.cookie}
+                    iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                  />
+                </>}
               />
             </List.Item>
           )}
@@ -118,5 +137,60 @@ export default class AccountComponent extends React.Component {
     })
   }
 
+  copyText(index: number) {
+    let text = this.state.accountInfo[index].cookie;
+    copyText(text).then(() => {
+      this.showMessage("复制成功！");
+    })
 
+  }
+
+  showMessage(content: string, duration: number = 1) {
+    message.success({ content, duration });
+  }
+
+  getAccountInfoAsync(tips: boolean = true) {
+    localStoragePromise.get("account").then((res: { [key: string]: IAccount }) => {
+      let data = [];
+      let { account } = res;
+      for (let key in account) {
+        data.push(account[key]);
+      }
+      console.log(data);
+      this.setState(
+        {
+          accountInfo: data
+        },
+        tips ? () => {
+          this.showMessage("获取缓存数据成功!");
+        } : null
+      );
+    })
+  }
+
+
+
+  deleteCookie(index: number) {
+    let curPin = this.state.accountInfo[index].curPin;
+    localStoragePromise.get("account").then((res: any) => {
+      let { account } = res;
+      delete account[curPin];
+      localStoragePromise.set({
+        account
+      })
+      this.showMessage("删除成功！");
+      this.getAccountInfoAsync(false);
+    })
+  }
+
+  clearAllCookie() {
+    localStoragePromise.set({
+      account: {}
+    });
+    this.showMessage("已清空所有账号cookie");
+    this.setState(
+      {
+        accountInfo: []
+      });
+  }
 }

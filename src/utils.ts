@@ -95,6 +95,14 @@ export const postChromeMessage = (event: IEvent) => {
     })
 }
 
+export const copyText = (text: string) => {
+    return new Promise<void>((resolve, reject) => {
+        navigator.clipboard.writeText(text).then(() => {
+            resolve();
+        });
+    })
+}
+
 export const storagePromise = {
     // sync
     sync: {

@@ -42,10 +42,9 @@ const getCookie = () => {
             if (ck) {
                 // 校验ck有效性
                 getUserInfo(ck).then((res: Object) => {
-                    Object.assign(res, { cookie: ck });
+                    Object.assign(res, { cookie: ck,createDate:Date.now() });
                     let curPin: string = res['curPin'];
                     localStoragePromise.get("account").then((storage: any) => {
-                        console.log(storage);
                         let { account } = storage;
                         if (account[curPin]) {
                             console.log("覆盖");
@@ -53,9 +52,11 @@ const getCookie = () => {
                         account[curPin] = res;
                         localStoragePromise.set({
                             account
+                        }).then(()=>{
+                            postChromeMessage({ type: GET_COOKIES_SUCCESS });
                         });
                     });
-                    postChromeMessage({ type: GET_COOKIES_SUCCESS });
+                    
                 }).catch((e) => {
                     console.warn(e);
                     // todo
@@ -179,6 +180,7 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
             loginWindow = null;
             getCookie().then(() => {
                 restoreCookies();
+                postChromeMessage({ type: GET_COOKIES_SUCCESS });
             });
             break;
         case CLOSE_LOGIN_WINDOW:
