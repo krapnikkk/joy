@@ -37,7 +37,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&sceneval=2&ufc=&"
+        "https://home.m.jd.com/myJd/*",
+        "https://plogin.m.jd.com/login/*"
       ],
       "js": [
         "js/content.bundle.js"

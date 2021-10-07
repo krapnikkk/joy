@@ -23,16 +23,6 @@ const page = process.env.PAGE;
 const isUseExLoader = process.env.EX_LOADER;
 let pages;
 
-// if (page) {
-//   if (isUseExLoader) {
-//     pages = ["background", "content"];
-//   } else {
-//     pages = [page];
-//   }
-// } else {
-//   // pages = ["options", "background", "content", "view-tab"];
-//   pages = ["background", "content"];
-// }
 
 if (page) {
   if (isUseExLoader) {
