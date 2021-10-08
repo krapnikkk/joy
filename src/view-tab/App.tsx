@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Route, Link, Redirect } from 'react-router-dom';
 import { Routes } from './router';
-import { Menu } from 'antd';
+import { Affix, Button, Menu } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import { GITHUB_URL } from '@src/constants';
 import './App.css';
@@ -26,6 +26,11 @@ const App: React.FC = () => (
         )
       }
     </Content>
+    <Affix style={{ position: 'absolute', bottom: "230px", right: "50px" }}>
+        <Button type="primary" onClick={() => {}}>
+          Affix top
+        </Button>
+      </Affix>
   </div>
 );
 
