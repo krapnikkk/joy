@@ -19,7 +19,7 @@ const App: React.FC = () => (
       <iframe src={GITHUB_URL} frameBorder="0" scrolling="0" width="90px" height="21px"></iframe>
     </Header>
     <Content className="content">
-      <Redirect to="/account" />
+      <Redirect to="/activity" />
       {
         Routes.map((route, index) => 
            <Route key={index} path={route.path} component={route.component} />

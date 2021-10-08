@@ -19,4 +19,7 @@ h4{
 }
 .content{
     background-color: azure;
+    /* width: 75vw; */
+    width: 1000px;
+    margin: auto;
 }

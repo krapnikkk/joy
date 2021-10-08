@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export interface IProperty extends PropertyDescriptor {
     enumerable: boolean | undefined;
     set?: (v: any) => void;
@@ -21,4 +23,9 @@ export interface IAccount {
     pinlist: string;
     userLevel: string;
     createDate:number;
+}
+
+export interface IActivity{
+    name:string;
+    component:React.ComponentType
 }

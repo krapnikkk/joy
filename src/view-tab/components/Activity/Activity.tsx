@@ -1,9 +1,11 @@
-import {message } from 'antd';
+import { message, Tabs } from 'antd';
 import * as React from 'react'
 import './Activity.css';
 import { AUTO_GET_COOKIES, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
 import { copyText, localStoragePromise } from '@src/utils';
 import { IAccount } from '@src/@types';
+import { Content } from 'antd/lib/layout/layout';
+import { activityInfo } from '@src/view-tab/Config';
 
 interface IState {
   accountInfo: IAccount[];
@@ -44,7 +46,13 @@ export default class Activity extends React.Component<IProps, IState, {}> {
   render() {
     return (
       <section>
-        页面施工中👷
+        <Content>
+          <Tabs tabPosition="left">
+            {
+              activityInfo.map((activity, index) => <Tabs.TabPane tab={activity.name} key={index}><activity.component /></Tabs.TabPane>)
+            }
+          </Tabs>
+        </Content>
       </section>
     )
   }

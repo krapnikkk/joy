@@ -1,5 +1,5 @@
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS } from "../Events";
-import { localStoragePromise, postChromeMessage } from "@src/utils";
+import { localStoragePromise, openWindow, postChromeMessage } from "@src/utils";
 import { HOME_PAGE, MARK, USER_INFO_URL } from "@src/constants";
 import axios from "axios";
 
@@ -73,7 +73,7 @@ const openLoginWindow = (login: boolean = false) => {
     if (loginWindow) {
         loginWindow.blur();
     } else {
-        loginWindow = window.open(`${HOME_PAGE}?${MARK}`, "_blank", "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=375, height=677");
+        loginWindow = openWindow(`${HOME_PAGE}?${MARK}`);
     }
 }
 
