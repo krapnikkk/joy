@@ -331,3 +331,7 @@ export const storagePromise = {
 
 export const localStoragePromise = storagePromise.local;
 export const syncStoragePromise = storagePromise.sync;
+
+export const openWindow = (url: string): Window => {
+    return window.open(url, "_blank", "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=375, height=680");
+}
