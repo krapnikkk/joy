@@ -28,7 +28,6 @@
     ],
     "persistent": true
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://hm.baidu.com 'unsafe-inline'; object-src 'self'",
   "web_accessible_resources": [
     "js/inject.bundle.js"
   ],
