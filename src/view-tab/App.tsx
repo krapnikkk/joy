@@ -17,7 +17,7 @@ const App: React.FC = () => (
         <Menu.Item key="4"><Link to="/setting">全局设置</Link></Menu.Item>
       </Menu>
       <section>
-        <img src="https://profile-counter.glitch.me/joy/count.svg" alt="visitcount" width="100" />
+        {/* <img src="https://profile-counter.glitch.me/joy/count.svg" alt="visitcount" width="100" /> */}
         <iframe src={GITHUB_URL} frameBorder="0" scrolling="0" width="90px" height="21px"></iframe>
       </section>
     </Header>

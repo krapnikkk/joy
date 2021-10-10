@@ -1,7 +1,8 @@
-import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS } from "../Events";
-import { localStoragePromise, openWindow, postChromeMessage } from "@src/utils";
-import { HOME_PAGE, MARK, USER_INFO_URL } from "@src/constants";
-import axios from "axios";
+import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
+import { createAlarms, get, localStoragePromise, openWindow, postChromeMessage } from "@src/utils";
+import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, GENERIC_JR_HOST, HOME_PAGE, MARK, USER_AGENT, USER_INFO_URL } from "@src/constants";
+// import axios from "axios";
+declare let AAR: any;
 
 chrome.browserAction.onClicked.addListener(function () {
     const index = chrome.extension.getURL('view-tab.html');
@@ -14,7 +15,6 @@ chrome.browserAction.onClicked.addListener(function () {
         }
     });
 });
-
 
 chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install') {
@@ -35,7 +35,7 @@ const getCookie = () => {
         chrome.cookies.getAll({ 'domain': '.jd.com' }, function (cookies) {
             let ck = "";
             cookies.forEach((cookie) => {
-                if (cookie.name == "pt_pin" || cookie.name == "pt_token" || cookie.name == "pt_key") {
+                if (COOKIE_KEYS.includes(cookie.name)) {
                     ck += `${cookie.name}=${cookie.value}; `;
                 }
             })
@@ -45,7 +45,7 @@ const getCookie = () => {
                     Object.assign(res, { cookie: ck, createDate: Date.now() });
                     let curPin: string = res['curPin'];
                     localStoragePromise.get("account").then((storage: any) => {
-                        let account = storage.account||{};
+                        let account = storage.account || {};
                         if (account[curPin]) {
                             console.log("覆盖");
                         }
@@ -115,51 +115,54 @@ const restoreCookies = () => {
 }
 
 const getUserInfo = (cookie: string) => {
-    let handler = updateHeader("cookie", cookie);
-    return new Promise((resolve, reject) => {
-        axios.get(USER_INFO_URL, {
-        }).then((res) => {
-            let data = res.data;
-            console.log(data);
-            removeHeader(handler);
-            if (data.retcode != "0") {
-                reject(new Error(data.msg));
-            } else {
-                resolve(data.data.userInfo.baseInfo);
-            }
-        }).catch((e) => {
-            removeHeader(handler);
-            console.warn(e);
-            reject(e);
-        })
-    })
-
+    return get(USER_INFO_URL, { cookie }).then((res: any) => {
+        return res.data.userInfo.baseInfo;
+    });
 }
 
-const updateHeader = (name: string, value: string) => {
-    let setHeader = (details: chrome.webRequest.WebRequestHeadersDetails) => {
-        details.requestHeaders.forEach((requestHeader) => {
-            if (requestHeader.name.toLowerCase() === name) {
-                requestHeader.value = value;
-            }
-        });
-        return { requestHeaders: details.requestHeaders };
-    }
+// const queueTask = (task:Function) => {
 
-    chrome.webRequest.onBeforeSendHeaders.addListener(
-        setHeader,
-        { urls: [USER_INFO_URL] },
-        ["blocking", "requestHeaders", "extraHeaders"]
-    );
-    return setHeader;
+// }
+
+const toWithdraw = (cookie?:string) => {
+    var environment = "other";//"jrApp",
+    var eid = "";
+    var fp = "";
+    var channelLv = "clv";
+    var shareUuid = "uuid";
+    var riskDeviceInfo = JSON.stringify({
+        eid,
+        fp
+    });
+    var signData = {
+        channelLv,
+        environment,
+        riskDeviceInfo,
+        shareUuid,
+    };
+    var aar = new AAR(); // 1，new对象
+    var nonce = aar.nonce(); // 2，产生nonce
+    var signature = aar.sign(JSON.stringify(signData), nonce); // 3，对signData签名
+    var reqData = {
+        ...signData,
+        "timeSign": Math.random(),
+        nonce,
+        signature
+    };
+    let url = `${GENERIC_JR_HOST}toDailyHome?reqData=${JSON.stringify(reqData)}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://active.jd.com/",
+        cookie
+    };
+    return get(url, header);
 }
+chrome['toWithdraw'] = toWithdraw;
+toWithdraw();
 
-const removeHeader = (callback: (details: chrome.webRequest.WebRequestHeadersDetails) => {
-    requestHeaders: chrome.webRequest.HttpHeader[];
-}) => {
-    chrome.webRequest.onBeforeSendHeaders.removeListener(callback);
-}
 
+
+// 事件监听
 chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
     console.log(request);
     switch (request.type) {
@@ -189,10 +192,26 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
                 restoreCookies();
             }
             break;
+        case REQUEST:
+            break;
         default:
             console.log(request)
             break;
     }
 });
+
+// 定时任务
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name == "activity") {
+        toWithdraw();
+    }
+})
+
+const startScheduleTask = () => {
+    createAlarms("activity", {
+        periodInMinutes: ACTIVITY_TASK_INTERVAL
+    });
+}
+startScheduleTask();
 
 

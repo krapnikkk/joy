@@ -1,3 +1,4 @@
+import axios from "axios";
 import { IEvent, IProperty } from "./@types";
 
 const breakOn = (obj: {}, propertyName: string, mode: string | boolean, func: (val: any) => void) => {
@@ -334,4 +335,64 @@ export const syncStoragePromise = storagePromise.sync;
 
 export const openWindow = (url: string): Window => {
     return window.open(url, "_blank", "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=375, height=680");
+}
+
+export const get = (url: string, header: { [key: string]: string }) => {
+    return new Promise((resolve, reject) => {
+        let handler = updateHeader(header);
+        axios.get(url).then((res) => {
+            let data = res.data;
+            console.log(data);
+            removeHeader(handler);
+            if (data.retcode != "0" && data.resultCode != 0) {
+                reject(new Error(data));
+            } else {
+                resolve(data);
+            }
+        }).catch((e) => {
+            removeHeader(handler);
+            console.warn(e);
+            reject(e);
+        })
+    })
+}
+
+export const updateHeader = (header: { [key: string]: string }, filter?: string) => {
+    let setHeader = (details: chrome.webRequest.WebRequestHeadersDetails) => {
+        details.requestHeaders.forEach((requestHeader) => {
+            for (let [name, value] of Object.entries(header)) {
+                if (value && requestHeader.name.toLowerCase() === name.toLowerCase()) {
+                    requestHeader.value = value;
+                    break;
+                }
+            }
+        });
+        if (header["Referer"]) {
+            details.requestHeaders.push({ name: "Referer", value: header["Referer"] });
+        }
+        return { requestHeaders: details.requestHeaders };
+    }
+
+    chrome.webRequest.onBeforeSendHeaders.addListener(
+        setHeader,
+        // { urls: [filter || "<all_urls>"] },
+        { urls: [ "<all_urls>"] },
+        ["blocking", "requestHeaders", "extraHeaders"]
+    );
+    return setHeader;
+}
+
+export const removeHeader = (callback: (details: chrome.webRequest.WebRequestHeadersDetails) => {
+    requestHeaders: chrome.webRequest.HttpHeader[];
+}) => {
+    chrome.webRequest.onBeforeSendHeaders.removeListener(callback);
+}
+
+export const clearScheduleTask = () => {
+    chrome.alarms.clearAll(() => {
+    });
+}
+
+export const createAlarms = (name: string, alarmInfo: chrome.alarms.AlarmCreateInfo) => {
+    chrome.alarms.create(name, alarmInfo);
 }
