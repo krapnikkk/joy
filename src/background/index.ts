@@ -1,8 +1,10 @@
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
 import { createAlarms, get, localStoragePromise, openWindow, postChromeMessage } from "@src/utils";
 import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, GENERIC_JR_HOST, HOME_PAGE, MARK, USER_AGENT, USER_INFO_URL } from "@src/constants";
+import { IAccount } from "@src/@types";
 // import axios from "axios";
 declare let AAR: any;
+
 
 chrome.browserAction.onClicked.addListener(function () {
     const index = chrome.extension.getURL('view-tab.html');
@@ -59,7 +61,6 @@ const getCookie = () => {
 
                 }).catch((e) => {
                     console.warn(e);
-                    // todo
                 });
             } else {
                 openLoginWindow();
@@ -76,7 +77,6 @@ const openLoginWindow = (login: boolean = false) => {
         loginWindow = openWindow(`${HOME_PAGE}?${MARK}`);
     }
 }
-
 
 const resetCookies = () => {
     return new Promise<void>((resolve) => {
@@ -120,11 +120,46 @@ const getUserInfo = (cookie: string) => {
     });
 }
 
-// const queueTask = (task:Function) => {
+const queueTask = (task: Function) => {
+    localStoragePromise.get("account").then(async (res: { [key: string]: IAccount }) => {
+        // let data = [];
+        let { account } = res;
+        for (let key in account) {
+            // data.push(account[key]);
+            let user = account[key];
+            let { cookie } = user;
+            // console.log(cookie);
+            let info = await task(cookie);
+            console.log(info);
+        }
+        // console.log(data);
+        // for(let i = 0;i<data.length;i++){
+        //     await toWithdraw()
+        // }
+    })
+}
 
+// const getAccountInfoAsync = () => {
+//     localStoragePromise.get("account").then(async (res: { [key: string]: IAccount }) => {
+//         // let data = [];
+//         let { account } = res;
+//         for (let key in account) {
+//             // data.push(account[key]);
+//             let user = account[key];
+//             let { cookie } = user;
+//             // console.log(cookie);
+//             let info = await toWithdraw(cookie);
+//             console.log(info);
+//         }
+//         // console.log(data);
+//         // for(let i = 0;i<data.length;i++){
+//         //     await toWithdraw()
+//         // }
+//     })
 // }
+// getAccountInfoAsync();
 
-const toWithdraw = (cookie?:string) => {
+const toWithdraw = (cookie?: string) => {
     var environment = "other";//"jrApp",
     var eid = "";
     var fp = "";
@@ -158,13 +193,11 @@ const toWithdraw = (cookie?:string) => {
     return get(url, header);
 }
 chrome['toWithdraw'] = toWithdraw;
-toWithdraw();
-
+// toWithdraw();
 
 
 // 事件监听
 chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
-    console.log(request);
     switch (request.type) {
         case AUTO_GET_COOKIES:
             getCookie();
@@ -203,7 +236,8 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
 // 定时任务
 chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name == "activity") {
-        toWithdraw();
+        // toWithdraw();
+        queueTask(toWithdraw);
     }
 })
 

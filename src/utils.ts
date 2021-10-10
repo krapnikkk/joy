@@ -337,13 +337,12 @@ export const openWindow = (url: string): Window => {
     return window.open(url, "_blank", "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=375, height=680");
 }
 
-export const get = (url: string, header: { [key: string]: string }) => {
+export const get = (url: string, header?: { [key: string]: string }) => {
     return new Promise((resolve, reject) => {
         let handler = updateHeader(header);
         axios.get(url).then((res) => {
-            let data = res.data;
-            console.log(data);
             removeHeader(handler);
+            let data = res.data;
             if (data.retcode != "0" && data.resultCode != 0) {
                 reject(new Error(data));
             } else {
@@ -363,20 +362,20 @@ export const updateHeader = (header: { [key: string]: string }, filter?: string)
             for (let [name, value] of Object.entries(header)) {
                 if (value && requestHeader.name.toLowerCase() === name.toLowerCase()) {
                     requestHeader.value = value;
+                    delete header[name];
                     break;
                 }
             }
         });
-        if (header["Referer"]) {
-            details.requestHeaders.push({ name: "Referer", value: header["Referer"] });
+        for (let [name, value] of Object.entries(header)) {
+            details.requestHeaders.push({ name, value });
         }
         return { requestHeaders: details.requestHeaders };
     }
 
     chrome.webRequest.onBeforeSendHeaders.addListener(
         setHeader,
-        // { urls: [filter || "<all_urls>"] },
-        { urls: [ "<all_urls>"] },
+        { urls: ["<all_urls>"] },
         ["blocking", "requestHeaders", "extraHeaders"]
     );
     return setHeader;
@@ -386,6 +385,16 @@ export const removeHeader = (callback: (details: chrome.webRequest.WebRequestHea
     requestHeaders: chrome.webRequest.HttpHeader[];
 }) => {
     chrome.webRequest.onBeforeSendHeaders.removeListener(callback);
+}
+
+export const getResponse = () => {
+    chrome.webRequest.onHeadersReceived.addListener(
+        (details: chrome.webRequest.WebRequestHeadersDetails) => {
+            console.log(details);
+        },
+        { urls: ["<all_urls>"] },
+        ["responseHeaders","extraHeaders"]
+    );
 }
 
 export const clearScheduleTask = () => {
