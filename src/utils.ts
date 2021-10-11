@@ -1,6 +1,6 @@
 import axios from "axios";
 import { IEvent, IProperty } from "./@types";
-
+declare let AAR: any;
 const breakOn = (obj: {}, propertyName: string, mode: string | boolean, func: (val: any) => void) => {
     // this is directly from https://github.com/paulmillr/es6-shim
     function getPropertyDescriptor(obj: {}, name: string) {
@@ -338,8 +338,9 @@ export const openWindow = (url: string): Window => {
 }
 
 export const get = (url: string, header?: { [key: string]: string }) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         let handler = updateHeader(header);
+        await sleep(100); // fix updateHeader
         axios.get(url).then((res) => {
             removeHeader(handler);
             let data = res.data;
@@ -368,7 +369,9 @@ export const updateHeader = (header: { [key: string]: string }, filter?: string)
             }
         });
         for (let [name, value] of Object.entries(header)) {
-            details.requestHeaders.push({ name, value });
+            if (value) {
+                details.requestHeaders.push({ name, value });
+            }
         }
         return { requestHeaders: details.requestHeaders };
     }
@@ -393,8 +396,35 @@ export const getResponse = () => {
             console.log(details);
         },
         { urls: ["<all_urls>"] },
-        ["responseHeaders","extraHeaders"]
+        ["responseHeaders", "extraHeaders"]
     );
+}
+
+export const getSignature = (signData: {}) => {
+    let aar = new AAR();
+    let nonce = aar.nonce();
+    let signature = aar.sign(JSON.stringify(signData), nonce);
+    return {
+        nonce, signature
+    }
+}
+
+export const getReqData = (signData: {},sign:boolean = true) => {
+    let signature = sign ? getSignature(signData) : null;
+    let reqData = {
+        ...signData,
+        "timeSign": Math.random(),
+        ...signature
+    };
+    return JSON.stringify(reqData);
+}
+
+export const sleep = (delay: number) => {
+    return new Promise<void>((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, delay);
+    })
 }
 
 export const clearScheduleTask = () => {
