@@ -9,3 +9,12 @@ export const ACTIVITY_TASK_INTERVAL: number = 1;
 export const USER_AGENT:string= "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
 export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key"]; // "3AB9D23F7A4B3C9B"   
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
+
+//activity
+export const  globalInfo = {
+    environment: "other",//"jrApp",
+    eid: "",
+    fp: "",
+    channelLv: "clv",
+    shareUuid: "uuid",
+};

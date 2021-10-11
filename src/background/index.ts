@@ -1,10 +1,8 @@
+import { IAccount } from "@src/@types";
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
 import { createAlarms, get, localStoragePromise, openWindow, postChromeMessage } from "@src/utils";
-import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, GENERIC_JR_HOST, HOME_PAGE, MARK, USER_AGENT, USER_INFO_URL } from "@src/constants";
-import { IAccount } from "@src/@types";
-// import axios from "axios";
-declare let AAR: any;
-
+import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, HOME_PAGE, MARK, USER_INFO_URL } from "@src/constants";
+import { toDailyHome, toDailySignIn, toGoldExchange, toWithdraw } from "@src/Activity";
 
 chrome.browserAction.onClicked.addListener(function () {
     const index = chrome.extension.getURL('view-tab.html');
@@ -122,79 +120,21 @@ const getUserInfo = (cookie: string) => {
 
 const queueTask = (task: Function) => {
     localStoragePromise.get("account").then(async (res: { [key: string]: IAccount }) => {
-        // let data = [];
         let { account } = res;
         for (let key in account) {
-            // data.push(account[key]);
             let user = account[key];
             let { cookie } = user;
-            // console.log(cookie);
             let info = await task(cookie);
             console.log(info);
         }
-        // console.log(data);
-        // for(let i = 0;i<data.length;i++){
-        //     await toWithdraw()
-        // }
     })
 }
 
-// const getAccountInfoAsync = () => {
-//     localStoragePromise.get("account").then(async (res: { [key: string]: IAccount }) => {
-//         // let data = [];
-//         let { account } = res;
-//         for (let key in account) {
-//             // data.push(account[key]);
-//             let user = account[key];
-//             let { cookie } = user;
-//             // console.log(cookie);
-//             let info = await toWithdraw(cookie);
-//             console.log(info);
-//         }
-//         // console.log(data);
-//         // for(let i = 0;i<data.length;i++){
-//         //     await toWithdraw()
-//         // }
-//     })
-// }
-// getAccountInfoAsync();
-
-const toWithdraw = (cookie?: string) => {
-    var environment = "other";//"jrApp",
-    var eid = "";
-    var fp = "";
-    var channelLv = "clv";
-    var shareUuid = "uuid";
-    var riskDeviceInfo = JSON.stringify({
-        eid,
-        fp
-    });
-    var signData = {
-        channelLv,
-        environment,
-        riskDeviceInfo,
-        shareUuid,
-    };
-    var aar = new AAR(); // 1，new对象
-    var nonce = aar.nonce(); // 2，产生nonce
-    var signature = aar.sign(JSON.stringify(signData), nonce); // 3，对signData签名
-    var reqData = {
-        ...signData,
-        "timeSign": Math.random(),
-        nonce,
-        signature
-    };
-    let url = `${GENERIC_JR_HOST}toDailyHome?reqData=${JSON.stringify(reqData)}`;
-    let header = {
-        "User-Agent": USER_AGENT,
-        "Referer": "https://active.jd.com/",
-        cookie
-    };
-    return get(url, header);
-}
 chrome['toWithdraw'] = toWithdraw;
+chrome['toGoldExchange'] = toGoldExchange;
+chrome['toDailySignIn'] = toDailySignIn;
+chrome['toDailyHome'] = toDailyHome;
 // toWithdraw();
-
 
 // 事件监听
 chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
@@ -236,7 +176,6 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
 // 定时任务
 chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name == "activity") {
-        // toWithdraw();
         queueTask(toWithdraw);
     }
 })
