@@ -357,6 +357,26 @@ export const get = (url: string, header?: { [key: string]: string }) => {
     })
 }
 
+export const post = (url:string,data:{},header?: { [key: string]: string })=> {
+    return new Promise(async (resolve, reject) => {
+        let handler = updateHeader(header);
+        await sleep(100); // fix updateHeader
+        axios.post(url,data).then((res) => {
+            removeHeader(handler);
+            let data = res.data;
+            if (data.retcode != "0" && data.resultCode != 0) {
+                reject(new Error(data));
+            } else {
+                resolve(data);
+            }
+        }).catch((e) => {
+            removeHeader(handler);
+            console.warn(e);
+            reject(e);
+        })
+    })
+}
+
 export const updateHeader = (header: { [key: string]: string }, filter?: string) => {
     let setHeader = (details: chrome.webRequest.WebRequestHeadersDetails) => {
         details.requestHeaders.forEach((requestHeader) => {

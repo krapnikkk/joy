@@ -6,6 +6,7 @@ import { copyText, localStoragePromise, openWindow } from '@src/utils';
 import { IAccount } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
 import './index.css';
+import TextArea from 'antd/lib/input/TextArea';
 
 interface IState {
     accountInfo: IAccount[];
@@ -25,7 +26,6 @@ export default class Goose extends React.Component<IProps, IState, {}> {
     public componentDidMount() {
         // console.log("componentDidMount");
     }
-
 
     addEvent() {
         chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
@@ -50,14 +50,34 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                     ghost={true}
                     title="天天提鹅"
                     extra={[
-                        <Button key="1" onClick={()=>{
+                        <Button key="1" type={'primary'} onClick={() => {
                             openWindow("https://active.jd.com/forever/btgoose/#/")
                         }}>跳转活动</Button>,
                     ]}
                 ></PageHeader>
                 <Content>
                     <Card>
-                        <div className="setting-item">
+                        <section className="setting-item">
+                            <p>
+                                <Button type="primary">
+                                    活动信息
+                                </Button>
+                                <Button type="primary">
+                                    提鹅收蛋
+                                </Button>
+                                <Button type="primary">
+                                    每日签到
+                                </Button>
+                                <Button type="primary">
+                                    领取任务
+                                </Button>
+                                <Button type="primary">
+                                    兑换积分
+                                </Button>
+                            </p>
+                            <TextArea rows={4} />
+                        </section>
+                        <section className="setting-item">
                             <p>
                                 调度开关：
                                 <Tooltip
@@ -67,35 +87,12 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                                     <QuestionCircleOutlined />
                                 </Tooltip>
                                 <Switch
-                                size="small"
-                                checked={false}
-                                defaultChecked={false}
+                                    size="small"
+                                    checked={false}
+                                    defaultChecked={false}
                                 // onChange={this.onScheduleSwitchChange.bind(this)}
-                            />
+                                />
                             </p>
-                            
-                        </div>
-                        <div className="setting-item">
-                            <p>
-                                调度次数：
-                                <Tooltip
-                                    placement="top"
-                                    title="每天接受服务器指令调度浏览帖子的次数(零点重置次数)"
-                                >
-                                    <QuestionCircleOutlined />
-                                </Tooltip>
-                            </p>
-                            <Radio.Group
-                                size="small"
-                                // onChange={this.onScheduleTimeChange.bind(this)}
-                                value="value"
-                                disabled={false}
-                            >
-                                <Radio value={1}>1</Radio>
-                                <Radio value={2}>2</Radio>
-                            </Radio.Group>
-                        </div>
-                        <div className="setting-item">
                             <p>
                                 调度间隔(分)：
                                 <Tooltip
@@ -114,7 +111,7 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                                 <Radio value={1}>1</Radio>
                                 <Radio value={2}>2</Radio>
                             </Radio.Group>
-                        </div>
+                        </section>
                         <p>
                             调度时间：
                             <Tooltip
