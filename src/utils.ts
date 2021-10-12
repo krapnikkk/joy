@@ -105,75 +105,6 @@ export const copyText = (text: string) => {
 }
 
 export const storagePromise = {
-    // sync
-    sync: {
-        get: (keys: string) => {
-            const promise = new Promise((resolve, reject) => {
-                chrome.storage.sync.get(keys, (items) => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(items);
-                    }
-                });
-            });
-            return promise;
-        },
-        set: (items: Object) => {
-            const promise = new Promise<void>((resolve, reject) => {
-                chrome.storage.sync.set(items, () => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-            return promise;
-        },
-        getBytesInUse: (keys: string | string[]) => {
-            const promise = new Promise((resolve, reject) => {
-                chrome.storage.sync.getBytesInUse(keys, (items) => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(items);
-                    }
-                });
-            });
-            return promise;
-        },
-        remove: (keys: string | string[]) => {
-            const promise = new Promise<void>((resolve, reject) => {
-                chrome.storage.sync.remove(keys, () => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-            return promise;
-        },
-        clear: () => {
-            const promise = new Promise<void>((resolve, reject) => {
-                chrome.storage.sync.clear(() => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-            return promise;
-        },
-    },
-
     // local
     local: {
         get: (keys: string | Object | string[]) => {
@@ -243,95 +174,9 @@ export const storagePromise = {
         },
     },
 
-    // managed
-    managed: {
-        get: (keys: string | string[]) => {
-            const promise = new Promise((resolve, reject) => {
-                chrome.storage.managed.get(keys, (items) => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(items);
-                    }
-                });
-            });
-            return promise;
-        },
-        set: (items: Object) => {
-            const promise = new Promise<void>((resolve, reject) => {
-                chrome.storage.managed.set(items, () => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-            return promise;
-        },
-        getBytesInUse: (keys: string | string[]) => {
-            const promise = new Promise((resolve, reject) => {
-                chrome.storage.managed.getBytesInUse(keys, (items) => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(items);
-                    }
-                });
-            });
-            return promise;
-        },
-        remove: (keys: string | string[]) => {
-            const promise = new Promise<void>((resolve, reject) => {
-                chrome.storage.managed.remove(keys, () => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-            return promise;
-        },
-        clear: () => {
-            const promise = new Promise<void>((resolve, reject) => {
-                chrome.storage.managed.clear(() => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-            return promise;
-        },
-    },
-
-    // onChanged
-    onChanged: {
-        addListener: () => {
-            const promise = new Promise((resolve, reject) => {
-                chrome.storage.onChanged.addListener((changes) => {
-                    const err = chrome.runtime.lastError;
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(changes);
-                    }
-                });
-            });
-            return promise;
-        },
-    },
 };
 
 export const localStoragePromise = storagePromise.local;
-export const syncStoragePromise = storagePromise.sync;
 
 export const openWindow = (url: string): Window => {
     return window.open(url, "_blank", "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=375, height=680");
@@ -340,7 +185,7 @@ export const openWindow = (url: string): Window => {
 export const get = (url: string, header?: { [key: string]: string }) => {
     return new Promise(async (resolve, reject) => {
         let handler = updateHeader(header);
-        await sleep(100); // fix updateHeader
+        await sleep(250); // fix updateHeader
         axios.get(url).then((res) => {
             removeHeader(handler);
             let data = res.data;
@@ -360,7 +205,7 @@ export const get = (url: string, header?: { [key: string]: string }) => {
 export const post = (url:string,data:{},header?: { [key: string]: string })=> {
     return new Promise(async (resolve, reject) => {
         let handler = updateHeader(header);
-        await sleep(100); // fix updateHeader
+        await sleep(250); // fix updateHeader
         axios.post(url,data).then((res) => {
             removeHeader(handler);
             let data = res.data;

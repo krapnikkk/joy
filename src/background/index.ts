@@ -2,7 +2,7 @@ import { IAccount } from "@src/@types";
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
 import { createAlarms, get, localStoragePromise, openWindow, postChromeMessage } from "@src/utils";
 import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, HOME_PAGE, MARK, USER_INFO_URL } from "@src/constants";
-import { pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange, toWithdraw } from "@src/Activity";
+import { autoHarvest, pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange, toWithdraw } from "@src/Activity";
 
 chrome.browserAction.onClicked.addListener(function () {
     const index = chrome.extension.getURL('view-tab.html');
@@ -124,7 +124,7 @@ const queueTask = (task: Function) => {
         for (let key in account) {
             let user = account[key];
             let { cookie } = user;
-            let info = await task(cookie);
+            let info = await task(cookie,key);
             console.log(info);
         }
     })
@@ -135,7 +135,8 @@ chrome['toGoldExchange'] = toGoldExchange;
 chrome['toDailySignIn'] = toDailySignIn;
 chrome['toDailyHome'] = toDailyHome;
 chrome['pigPetOpenBox'] = pigPetOpenBox;
-
+chrome['autoHarvest'] = autoHarvest;
+queueTask(autoHarvest);
 // toWithdraw();
 
 // 事件监听
@@ -178,7 +179,9 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
 // 定时任务
 chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name == "activity") {
-        queueTask(toWithdraw);
+        // queueTask(toWithdraw);
+        // queueTask(pigPetOpenBox);
+        queueTask(autoHarvest);
     }
 })
 

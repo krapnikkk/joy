@@ -89,7 +89,7 @@ export const toDailyHome = (cookie?: string) => {
 
 export const pigPetOpenBox = (cookie?: string) => {
     let t = Date.now();
-    let reqData=JSON.stringify({ "source": 0, "channelLV": "yqs", "riskDeviceParam": "{}", "t": `${t}` });
+    let data = `reqData=${JSON.stringify({ "source": 0, "channelLV": "yqs", "riskDeviceParam": "{}", "t": `${t}` })}`;
     let url = `${GENERIC_JR_HOST}pigPetOpenBox?_=${t}`;
     let header = {
         "User-Agent": USER_AGENT,
@@ -97,5 +97,58 @@ export const pigPetOpenBox = (cookie?: string) => {
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
-    return post(url,{reqData}, header);
+    return post(url, data, header);
+}
+
+// 金果树
+
+const userInfoMap = {
+
+};
+export const login = (key: string, cookie?: string) => {
+    let t = Date.now();
+    let data = `reqData=${JSON.stringify({ "sharePin": "", "shareType": "1", "source": 2, "riskDeviceParam": "{\"fp\":\"\",\"eid\":\"\",\"sdkToken\":\"\",\"sid\":\"\"}" })}`;
+    let url = `${GENERIC_JR_HOST}login?_=${t}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://active.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return new Promise<void>((resolve) => {
+        let _key = key;
+        post(url, data, header).then((res: any) => {
+            userInfoMap[_key] = res.resultData.data;
+            harvest(_key, cookie).then((res) => {
+                resolve();
+            });
+        });
+    })
+}
+
+export const harvest = (key: string, cookie?: string) => {
+    let t = Date.now();
+    let info = userInfoMap[key];
+    let { userInfo, userToken } = info;
+    let data = `reqData=${JSON.stringify({ "source": 2, "sharePin": null, "userId": userInfo, userToken })}`;
+    let url = `${GENERIC_JR_HOST}harvest?_=${t}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://active.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return new Promise((resolve) => {
+        post(url, data, header).then((res)=>{
+            resolve(res);
+        });
+    })
+}
+
+export const autoHarvest = async (cookie: string, key: string) => {
+    if (userInfoMap[key]) {
+        await harvest(key, cookie);
+    } else {
+        await login(key, cookie);
+    }
 }
