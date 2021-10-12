@@ -182,44 +182,56 @@ export const openWindow = (url: string): Window => {
     return window.open(url, "_blank", "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=375, height=680");
 }
 
-export const get = (url: string, header?: { [key: string]: string }) => {
+export const _get = (url: string, header?: { [key: string]: string }) => {
     return new Promise(async (resolve, reject) => {
-        let handler = updateHeader(header);
-        await sleep(250); // fix updateHeader
+        // let handler = updateHeader(header,url);
+        // await sleep(500); // fix updateHeader
         axios.get(url).then((res) => {
-            removeHeader(handler);
-            let data = res.data;
-            if (data.retcode != "0" && data.resultCode != 0) {
-                reject(new Error(data));
-            } else {
-                resolve(data);
-            }
+            // removeHeader(handler);
+            resolve(res.data);
         }).catch((e) => {
-            removeHeader(handler);
+            // removeHeader(handler);
             console.warn(e);
             reject(e);
         })
     })
 }
 
-export const post = (url:string,data:{},header?: { [key: string]: string })=> {
+export const get = (url: string, header?: { [key: string]: string }) => {
+    return new Promise(async (resolve) => {
+        let handler = updateHeader(header, url);
+        await sleep(500); 
+        let res = await _get(url, header);
+        removeHeader(handler);
+        resolve(res);
+    })
+    // return res;
+}
+
+export const _post = (url: string, data: {}, header?: { [key: string]: string }) => {
     return new Promise(async (resolve, reject) => {
-        let handler = updateHeader(header);
-        await sleep(250); // fix updateHeader
-        axios.post(url,data).then((res) => {
-            removeHeader(handler);
-            let data = res.data;
-            if (data.retcode != "0" && data.resultCode != 0) {
-                reject(new Error(data));
-            } else {
-                resolve(data);
-            }
+        // let handler = updateHeader(header,url);
+        // await sleep(500); // fix updateHeader
+        axios.post(url, data).then((res) => {
+            // removeHeader(handler);
+            resolve(res.data);
         }).catch((e) => {
-            removeHeader(handler);
+            // removeHeader(handler);
             console.warn(e);
             reject(e);
         })
     })
+}
+
+export const post = (url: string, data: {}, header?: { [key: string]: string }) => {
+    return new Promise(async (resolve) => {
+        let handler = updateHeader(header);
+        await sleep(500); 
+        let res = await _post(url, data);
+        removeHeader(handler);
+        resolve(res);
+    })
+    // return res;
 }
 
 export const updateHeader = (header: { [key: string]: string }, filter?: string) => {
@@ -243,7 +255,7 @@ export const updateHeader = (header: { [key: string]: string }, filter?: string)
 
     chrome.webRequest.onBeforeSendHeaders.addListener(
         setHeader,
-        { urls: ["<all_urls>"] },
+        { urls: [filter || "<all_urls>"] },
         ["blocking", "requestHeaders", "extraHeaders"]
     );
     return setHeader;
@@ -274,7 +286,7 @@ export const getSignature = (signData: {}) => {
     }
 }
 
-export const getReqData = (signData: {},sign:boolean = true) => {
+export const getReqData = (signData: {}, sign: boolean = true) => {
     let signature = sign ? getSignature(signData) : null;
     let reqData = {
         ...signData,

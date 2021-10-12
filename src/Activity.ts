@@ -85,7 +85,7 @@ export const toDailyHome = (cookie?: string) => {
     return get(url, header);
 }
 
-
+// 养猪猪
 
 export const pigPetOpenBox = (cookie?: string) => {
     let t = Date.now();
@@ -98,6 +98,10 @@ export const pigPetOpenBox = (cookie?: string) => {
         "Content-type": "application/x-www-form-urlencoded"
     };
     return post(url, data, header);
+}
+
+export const pigPetLotteryPlay = (cookie?: string) => {
+
 }
 
 // 金果树
@@ -115,12 +119,12 @@ export const login = (key: string, cookie?: string) => {
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
-    return new Promise<void>((resolve) => {
+    return new Promise((resolve) => {
         let _key = key;
         post(url, data, header).then((res: any) => {
             userInfoMap[_key] = res.resultData.data;
             harvest(_key, cookie).then((res) => {
-                resolve();
+                resolve(res);
             });
         });
     })
@@ -139,16 +143,23 @@ export const harvest = (key: string, cookie?: string) => {
         "Content-type": "application/x-www-form-urlencoded"
     };
     return new Promise((resolve) => {
-        post(url, data, header).then((res)=>{
+        post(url, data, header).then((res) => {
             resolve(res);
         });
     })
 }
 
 export const autoHarvest = async (cookie: string, key: string) => {
-    if (userInfoMap[key]) {
-        await harvest(key, cookie);
-    } else {
-        await login(key, cookie);
-    }
+    return new Promise((resolve) => {
+        if (userInfoMap[key]) {
+            harvest(key, cookie).then((res) => {
+                resolve(res);
+            });
+        } else {
+            login(key, cookie).then((res) => {
+                resolve(res);
+            });;
+        }
+
+    })
 }
