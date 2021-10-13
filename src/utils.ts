@@ -199,7 +199,7 @@ export const _get = (url: string, header?: { [key: string]: string }) => {
 
 export const get = (url: string, header?: { [key: string]: string }) => {
     return new Promise(async (resolve) => {
-        let handler = updateHeader(header, url);
+        let handler = updateHeader(header);
         await sleep(500); 
         let res = await _get(url, header);
         removeHeader(handler);

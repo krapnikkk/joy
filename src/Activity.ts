@@ -1,5 +1,5 @@
 import { GENERIC_JR_HOST, globalInfo, USER_AGENT } from "./constants";
-import { get, getReqData, post } from "./utils";
+import { get, getReqData, localStoragePromise, post } from "./utils";
 
 export const toWithdraw = (cookie?: string) => {
     let { environment, eid, fp, channelLv, shareUuid } = globalInfo;
@@ -23,6 +23,18 @@ export const toWithdraw = (cookie?: string) => {
     return get(url, header);
 }
 
+export const autoToWithdraw = async(cookie?: string) => {
+    let now = new Date();
+    let date = `${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
+    let flag = await localStoragePromise.get(date);
+    if(flag){
+        return toWithdraw(cookie);
+    }else{
+        await toDailySignIn(cookie);
+        return toWithdraw(cookie);
+    }
+
+}
 
 export const toGoldExchange = (cookie?: string) => {
     let { environment, eid, fp, channelLv, shareUuid } = globalInfo;

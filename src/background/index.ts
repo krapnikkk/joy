@@ -2,7 +2,7 @@ import { IAccount } from "@src/@types";
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
 import { createAlarms, get, localStoragePromise, openWindow, postChromeMessage, sleep } from "@src/utils";
 import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, HOME_PAGE, MARK, USER_INFO_URL } from "@src/constants";
-import { autoHarvest, pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange, toWithdraw } from "@src/Activity";
+import { autoHarvest, autoToWithdraw, pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange } from "@src/Activity";
 
 chrome.browserAction.onClicked.addListener(function () {
     const index = chrome.extension.getURL('view-tab.html');
@@ -119,13 +119,13 @@ const getUserInfo = (cookie: string) => {
 }
 
 const queueTask = (task: Function) => {
-    return new Promise<void>((resolve)=>{
+    return new Promise<void>((resolve) => {
         localStoragePromise.get("account").then(async (res: { [key: string]: IAccount }) => {
             let { account } = res;
             for (let key in account) {
                 let user = account[key];
                 let { cookie } = user;
-                let info = await task(cookie,key);
+                let info = await task(cookie, key);
                 await sleep(500);
                 console.log(info);
             }
@@ -134,12 +134,13 @@ const queueTask = (task: Function) => {
     })
 }
 
-chrome['toWithdraw'] = toWithdraw;
+chrome['autoToWithdraw'] = autoToWithdraw;
 chrome['toGoldExchange'] = toGoldExchange;
 chrome['toDailySignIn'] = toDailySignIn;
 chrome['toDailyHome'] = toDailyHome;
 chrome['pigPetOpenBox'] = pigPetOpenBox;
 chrome['autoHarvest'] = autoHarvest;
+chrome['queueTask'] = queueTask;
 // queueTask(autoHarvest);
 // toWithdraw();
 
@@ -183,7 +184,7 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
 // 定时任务
 chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name == "activity") {
-        await queueTask(toWithdraw);
+        await queueTask(autoToWithdraw);
         await queueTask(pigPetOpenBox);
         await queueTask(autoHarvest);
     }
@@ -194,6 +195,15 @@ const startScheduleTask = () => {
         periodInMinutes: ACTIVITY_TASK_INTERVAL
     });
 }
+
+const dailySignIn = () => {
+    let now = new Date();
+    let date = `${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
+    let item = {};
+    item[date] = true;
+    localStoragePromise.set(item);
+}
+dailySignIn();
 startScheduleTask();
 
 
