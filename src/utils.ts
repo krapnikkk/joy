@@ -184,54 +184,40 @@ export const openWindow = (url: string): Window => {
 
 export const _get = (url: string, header?: { [key: string]: string }) => {
     return new Promise(async (resolve, reject) => {
-        // let handler = updateHeader(header,url);
-        // await sleep(500); // fix updateHeader
         axios.get(url).then((res) => {
-            // removeHeader(handler);
             resolve(res.data);
         }).catch((e) => {
-            // removeHeader(handler);
             console.warn(e);
             reject(e);
         })
     })
 }
 
-export const get = (url: string, header?: { [key: string]: string }) => {
-    return new Promise(async (resolve) => {
+export const get = async (url: string, header?: { [key: string]: string }) => {
         let handler = updateHeader(header);
         await sleep(500); 
         let res = await _get(url, header);
         removeHeader(handler);
-        resolve(res);
-    })
-    // return res;
+        return res;
 }
 
 export const _post = (url: string, data: {}, header?: { [key: string]: string }) => {
     return new Promise(async (resolve, reject) => {
-        // let handler = updateHeader(header,url);
-        // await sleep(500); // fix updateHeader
         axios.post(url, data).then((res) => {
-            // removeHeader(handler);
             resolve(res.data);
         }).catch((e) => {
-            // removeHeader(handler);
             console.warn(e);
             reject(e);
         })
     })
 }
 
-export const post = (url: string, data: {}, header?: { [key: string]: string }) => {
-    return new Promise(async (resolve) => {
+export const post = async (url: string, data: {}, header?: { [key: string]: string }) => {
         let handler = updateHeader(header);
         await sleep(500); 
         let res = await _post(url, data);
         removeHeader(handler);
-        resolve(res);
-    })
-    // return res;
+        return res;
 }
 
 export const updateHeader = (header: { [key: string]: string }, filter?: string) => {

@@ -23,13 +23,13 @@ export const toWithdraw = (cookie?: string) => {
     return get(url, header);
 }
 
-export const autoToWithdraw = async(cookie?: string) => {
+export const autoToWithdraw = async (cookie?: string) => {
     let now = new Date();
     let date = `${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
     let flag = await localStoragePromise.get(date);
-    if(flag){
+    if (flag) {
         return toWithdraw(cookie);
-    }else{
+    } else {
         await toDailySignIn(cookie);
         return toWithdraw(cookie);
     }
@@ -131,15 +131,8 @@ export const login = (key: string, cookie?: string) => {
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
-    return new Promise((resolve) => {
-        let _key = key;
-        post(url, data, header).then((res: any) => {
-            userInfoMap[_key] = res.resultData.data;
-            harvest(_key, cookie).then((res) => {
-                resolve(res);
-            });
-        });
-    })
+
+    return post(url, data, header);
 }
 
 export const harvest = (key: string, cookie?: string) => {
@@ -154,24 +147,12 @@ export const harvest = (key: string, cookie?: string) => {
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
-    return new Promise((resolve) => {
-        post(url, data, header).then((res) => {
-            resolve(res);
-        });
-    })
+    return post(url, data, header);
 }
 
 export const autoHarvest = async (cookie: string, key: string) => {
-    return new Promise((resolve) => {
-        if (userInfoMap[key]) {
-            harvest(key, cookie).then((res) => {
-                resolve(res);
-            });
-        } else {
-            login(key, cookie).then((res) => {
-                resolve(res);
-            });;
-        }
+    let res = await login(key, cookie) as any;
+    userInfoMap[key] = res.resultData.data;
+    return harvest(key, cookie);
 
-    })
 }
