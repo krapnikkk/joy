@@ -27,7 +27,7 @@ export const autoToWithdraw = async (cookie?: string) => {
     let now = new Date();
     let date = `${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
     let flag = await localStoragePromise.get(date);
-    if (flag) {
+    if (JSON.stringify(flag)!="{}") {
         return toWithdraw(cookie);
     } else {
         await toDailySignIn(cookie);
@@ -138,6 +138,9 @@ export const login = (key: string, cookie?: string) => {
 export const harvest = (key: string, cookie?: string) => {
     let t = Date.now();
     let info = userInfoMap[key];
+    if(!info){
+        return "info undefined";
+    }
     let { userInfo, userToken } = info;
     let data = `reqData=${JSON.stringify({ "source": 2, "sharePin": null, "userId": userInfo, userToken })}`;
     let url = `${GENERIC_JR_HOST}harvest?_=${t}`;

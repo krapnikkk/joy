@@ -10,6 +10,8 @@ export const USER_AGENT:string= "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like 
 export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key"]; // "3AB9D23F7A4B3C9B"   
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
 
+export const AFFIX_DATA_URL:string = "http://krapnik.cn/json/affix.json";
+
 //activity
 export const  globalInfo = {
     environment: "other",//"jrApp",

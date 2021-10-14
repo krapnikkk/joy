@@ -23,3 +23,13 @@ h4{
     width: 1000px;
     margin: auto;
 }
+.affix{
+    display: flex;
+    flex-flow: column; 
+    place-content: center; 
+    align-items: center;
+}
+.affix-btn{
+    height: 60px;
+    border-bottom: 1px solid #fff;
+}

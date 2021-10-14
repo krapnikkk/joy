@@ -1,6 +1,6 @@
 import { IAccount } from "@src/@types";
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
-import { createAlarms, get, localStoragePromise, openWindow, postChromeMessage, sleep } from "@src/utils";
+import { createAlarms, get, localStoragePromise, openWindow, postChromeMessage, sleep, updateHeader } from "@src/utils";
 import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, HOME_PAGE, MARK, USER_INFO_URL } from "@src/constants";
 import { autoHarvest, autoToWithdraw, pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange } from "@src/Activity";
 
@@ -203,6 +203,8 @@ const dailySignIn = () => {
     item[date] = true;
     localStoragePromise.set(item);
 }
+
+updateHeader({ "Access-Control-Allow-Origin": "*" });
 dailySignIn();
 startScheduleTask();
 

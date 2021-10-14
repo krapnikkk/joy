@@ -25,6 +25,15 @@ export interface IAccount {
     createDate:number;
 }
 
+export interface IAffixData{
+    name: string;
+    icon: string;
+    href: string;
+    hover: boolean;
+    image: string;
+    width: number;
+}
+
 export interface IActivity{
     name:string;
     component:React.ComponentType
