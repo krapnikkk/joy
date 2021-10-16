@@ -16,4 +16,4 @@ if (process.env.NODE_ENV !== 'development') {
     });
 }
 
-ReactDOM.render(<BrowserRouter><App /></BrowserRouter>, document.getElementById("view-tab"));
+ReactDOM.render(<BrowserRouter><App /></BrowserRouter>, document.getElementById("index"));
