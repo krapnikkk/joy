@@ -18,12 +18,11 @@ export default class AffixComponent extends React.Component<IProps, IState, {}> 
         this.loadAffixData();
     }
 
-    loadAffixData(){
-        fetch(AFFIX_DATA_URL).then((res)=>{return res.json}).then((data)=>{
-            console.log(data);
-            // this.setState({
-            //     data:data.data
-            // })
+    loadAffixData() {
+        fetch(AFFIX_DATA_URL).then(res => res.json()).then((res) => {
+            this.setState({
+                data:res.data
+            })
         })
     }
 

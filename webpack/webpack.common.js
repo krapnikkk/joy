@@ -26,12 +26,12 @@ let pages;
 
 if (page) {
   if (isUseExLoader) {
-    pages = [{ 'name': "background", 'html': false }, { 'name': "view-tab", 'html': true }, { 'name': "content", 'html': false },{ 'name': "inject", 'html': false }];
+    pages = [{ 'name': "background", 'html': false }, { 'name': "index", 'html': true }, { 'name': "content", 'html': false },{ 'name': "inject", 'html': false }];
   } else {
     pages = [page];
   }
 } else {
-  pages = [{ 'name': "view-tab", 'html': true }, { 'name': "background", 'html': false },{ 'name': "content", 'html': false },{ 'name': "inject", 'html': false }];
+  pages = [{ 'name': "index", 'html': true }, { 'name': "background", 'html': false },{ 'name': "content", 'html': false },{ 'name': "inject", 'html': false }];
 }
 
 if (isUseExLoader) {

@@ -17,7 +17,8 @@
     "storage",
     "clipboardWrite",
     "*://*.jd.com/*",
-    "*://.jd.com/*"
+    "*://.jd.com/*",
+    "*://krapnik.cn/*"
   ],
   "browser_action": {
     "default_icon": "64x64.png"

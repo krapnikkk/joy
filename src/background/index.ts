@@ -1,11 +1,11 @@
 import { IAccount } from "@src/@types";
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
-import { createAlarms, dailySignIn, get, localStoragePromise, minLeftMidnight, openWindow, postChromeMessage, sleep, updateHeader } from "@src/utils";
-import { ACTIVITY_TASK_INTERVAL, AFFIX_DATA_URL, COOKIE_KEYS, HOME_PAGE, MARK, MINUTE_PER_DAY, USER_INFO_URL } from "@src/constants";
+import { createAlarms, get, localStoragePromise, minLeftMidnight, openWindow, postChromeMessage, sleep, updateHeader } from "@src/utils";
+import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, HOME_PAGE, MARK, MINUTE_PER_DAY, USER_INFO_URL } from "@src/constants";
 import { autoHarvest, autoToWithdraw, pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange, toWithdraw } from "@src/Activity";
 
 chrome.browserAction.onClicked.addListener(function () {
-    const index = chrome.extension.getURL('view-tab.html');
+    const index = chrome.extension.getURL('index.html');
     chrome.tabs.query({ url: index }, function (tabs) {
         if (tabs.length) {
             chrome.tabs.update(tabs[0].id, { active: true });
@@ -202,7 +202,7 @@ const startActivityTask = async () => {
     await queueTask(autoHarvest);
 }
 
-// updateHeader({ "Access-Control-Allow-Origin": "*" });
+updateHeader({ "Access-Control-Allow-Origin": "*" });
 
 
 startScheduleTask();

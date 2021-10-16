@@ -5,7 +5,7 @@ import { AUTO_GET_COOKIES, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
 import { copyText, localStoragePromise } from '@src/utils';
 import { IAccount } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
-import { activityInfo } from '@src/view-tab/Config';
+import { activityInfo } from '@src/index/Config';
 
 interface IState {
   accountInfo: IAccount[];
