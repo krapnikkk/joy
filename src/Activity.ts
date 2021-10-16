@@ -1,5 +1,5 @@
 import { GENERIC_JR_HOST, globalInfo, USER_AGENT } from "./constants";
-import { get, getReqData, localStoragePromise, post } from "./utils";
+import { get, getReqData, post } from "./utils";
 
 export const toWithdraw = (cookie?: string) => {
     let { environment, eid, fp, channelLv, shareUuid } = globalInfo;
@@ -24,16 +24,9 @@ export const toWithdraw = (cookie?: string) => {
 }
 
 export const autoToWithdraw = async (cookie?: string) => {
-    let now = new Date();
-    let date = `${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
-    let flag = await localStoragePromise.get(date);
-    if (JSON.stringify(flag)!="{}") {
-        return toWithdraw(cookie);
-    } else {
-        await toDailySignIn(cookie);
-        return toWithdraw(cookie);
-    }
-
+    await toDailyHome(cookie);
+    await toDailySignIn(cookie);
+    return toWithdraw(cookie);
 }
 
 export const toGoldExchange = (cookie?: string) => {
@@ -59,13 +52,17 @@ export const toGoldExchange = (cookie?: string) => {
 }
 
 export const toDailySignIn = (cookie?: string) => {
-    let { environment, channelLv, shareUuid } = globalInfo;
+    let { environment, eid, fp, channelLv, shareUuid } = globalInfo;
     let signData = {
         channelLv,
         environment,
         shareUuid,
     };
-    let reqData = getReqData(signData)
+    let riskDeviceInfo = JSON.stringify({
+        eid,
+        fp
+    });
+    let reqData = getReqData(signData, true, { riskDeviceInfo });
     let url = `${GENERIC_JR_HOST}toDailySignIn?reqData=${reqData}`;
     let header = {
         "User-Agent": USER_AGENT,
@@ -82,12 +79,11 @@ export const toDailyHome = (cookie?: string) => {
         fp
     });
     let signData = {
-        riskDeviceInfo,
         channelLv,
         environment,
         shareUuid,
     };
-    let reqData = getReqData(signData, false);
+    let reqData = getReqData(signData, false, {riskDeviceInfo});
     let url = `${GENERIC_JR_HOST}toDailyHome?reqData=${reqData}`;
     let header = {
         "User-Agent": USER_AGENT,
@@ -138,7 +134,7 @@ export const login = (key: string, cookie?: string) => {
 export const harvest = (key: string, cookie?: string) => {
     let t = Date.now();
     let info = userInfoMap[key];
-    if(!info){
+    if (!info) {
         return "info undefined";
     }
     let { userInfo, userToken } = info;

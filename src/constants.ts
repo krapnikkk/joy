@@ -6,11 +6,14 @@ export const GITHUB_URL: string = `https://ghbtns.com/github-btn.html?user=krapn
 export const MARK: string = "type=mark";
 export const SCENE_VAL: string = `sceneval=2&ufc=&${MARK}`;
 export const ACTIVITY_TASK_INTERVAL: number = 5;
+export const MINUTE_PER_DAY:number = 1440;
+export const GMT: number = +8;
 export const USER_AGENT:string= "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
 export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key"]; // "3AB9D23F7A4B3C9B"   
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
 
-export const AFFIX_DATA_URL:string = "http://krapnik.cn/json/affix.json";
+export const EXTENSION_VERSION: string = "1.0.0";
+export const AFFIX_DATA_URL:string = "https://krapnik.cn/json/affix.json";
 
 //activity
 export const  globalInfo = {

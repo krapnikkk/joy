@@ -1,5 +1,6 @@
 import axios from "axios";
 import { IEvent, IProperty } from "./@types";
+import { GMT, MINUTE_PER_DAY } from "./constants";
 declare let AAR: any;
 const breakOn = (obj: {}, propertyName: string, mode: string | boolean, func: (val: any) => void) => {
     // this is directly from https://github.com/paulmillr/es6-shim
@@ -194,11 +195,11 @@ export const _get = (url: string, header?: { [key: string]: string }) => {
 }
 
 export const get = async (url: string, header?: { [key: string]: string }) => {
-        let handler = updateHeader(header);
-        await sleep(500); 
-        let res = await _get(url, header);
-        removeHeader(handler);
-        return res;
+    let handler = updateHeader(header);
+    await sleep(500);
+    let res = await _get(url, header);
+    removeHeader(handler);
+    return res;
 }
 
 export const _post = (url: string, data: {}, header?: { [key: string]: string }) => {
@@ -213,11 +214,11 @@ export const _post = (url: string, data: {}, header?: { [key: string]: string })
 }
 
 export const post = async (url: string, data: {}, header?: { [key: string]: string }) => {
-        let handler = updateHeader(header);
-        await sleep(500); 
-        let res = await _post(url, data);
-        removeHeader(handler);
-        return res;
+    let handler = updateHeader(header);
+    await sleep(500);
+    let res = await _post(url, data);
+    removeHeader(handler);
+    return res;
 }
 
 export const updateHeader = (header: { [key: string]: string }, filter?: string) => {
@@ -272,8 +273,9 @@ export const getSignature = (signData: {}) => {
     }
 }
 
-export const getReqData = (signData: {}, sign: boolean = true) => {
+export const getReqData = (signData: {}, sign: boolean = true,args:{} = {}) => {
     let signature = sign ? getSignature(signData) : null;
+    Object.assign(signData,args);
     let reqData = {
         ...signData,
         "timeSign": Math.random(),
@@ -297,4 +299,21 @@ export const clearScheduleTask = () => {
 
 export const createAlarms = (name: string, alarmInfo: chrome.alarms.AlarmCreateInfo) => {
     chrome.alarms.create(name, alarmInfo);
+}
+
+export const dailySignIn = () => {
+    let now = new Date();
+    let date = `${now.getFullYear()}${now.getMonth()}${now.getDate()}`;
+    let item = {};
+    item[date] = true;
+    localStoragePromise.set(item);
+}
+
+// 距离 0 点还剩下多少分钟，每日更新定时任务用
+export const minLeftMidnight = function (): number {
+    return MINUTE_PER_DAY - Math.round(timeNow() / 60) % MINUTE_PER_DAY
+}
+
+export const timeNow = () => {
+    return Math.round(Date.now() / 1000) + GMT * 3600;
 }
