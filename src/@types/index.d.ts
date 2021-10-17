@@ -22,10 +22,10 @@ export interface IAccount {
     nickname: string;
     pinlist: string;
     userLevel: string;
-    createDate:number;
+    createDate: number;
 }
 
-export interface IAffixData{
+export interface IAffixData {
     name: string;
     icon: string;
     href: string;
@@ -34,7 +34,20 @@ export interface IAffixData{
     width: number;
 }
 
-export interface IActivity{
-    name:string;
-    component:React.ComponentType
+export interface IActivity {
+    name: string;
+    component: React.ComponentType
+}
+
+export interface IActivityResData {
+    channelEncrypt: number;
+    resultCode: number;
+    resultData: IResultData;
+    resultMsg: string;
+}
+
+export interface IResultData {
+    code: string;
+    data: { [key: string]: Record };
+    msg: srting;
 }

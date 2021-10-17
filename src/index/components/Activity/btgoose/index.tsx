@@ -3,13 +3,16 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import * as React from 'react';
 import { AUTO_GET_COOKIES, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
 import { copyText, localStoragePromise, openWindow } from '@src/utils';
-import { IAccount } from '@src/@types';
+import { IAccount, IActivityResData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
 import './index.css';
 import TextArea from 'antd/lib/input/TextArea';
+import { autoToWithdraw, toDailyHome, toGoldExchange } from '@src/Activity';
+import { DateTime } from 'luxon';
 
 interface IState {
     accountInfo: IAccount[];
+    log: string;
 }
 interface IProps {
 }
@@ -18,7 +21,8 @@ export default class Goose extends React.Component<IProps, IState, {}> {
     constructor(props: IProps | Readonly<IProps>) {
         super(props);
         this.state = {
-            accountInfo: []
+            accountInfo: [],
+            log: ""
         };
         // this.addEvent();
     }
@@ -59,23 +63,29 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                     <Card>
                         <section className="setting-item">
                             <p>
-                                <Button type="primary">
-                                    活动信息
+                                <Button type="primary" onClick={() => {
+                                    this.toDailyHome();
+                                }}>
+                                    查看信息
                                 </Button>
-                                <Button type="primary">
-                                    提鹅收蛋
+                                <Button type="primary" onClick={() => {
+                                    this.toGoldExchange();
+                                }}>
+                                    兑换积分
                                 </Button>
                                 <Button type="primary">
                                     每日签到
                                 </Button>
+                                <Button type="primary" onClick={() => {
+                                    this.toWithdraw();
+                                }}>
+                                    提鹅收蛋
+                                </Button>
                                 <Button type="primary">
                                     领取任务
                                 </Button>
-                                <Button type="primary">
-                                    兑换积分
-                                </Button>
                             </p>
-                            <TextArea rows={4} />
+                            <TextArea rows={10} value={this.state.log} />
                         </section>
                         <section className="setting-item">
                             <p>
@@ -127,6 +137,47 @@ export default class Goose extends React.Component<IProps, IState, {}> {
         )
     }
 
+    async toDailyHome() {
+        let res = await toDailyHome() as IActivityResData;
+        let resultData = res.resultData.data;
+        let { userLevelDto, availableTotal } = resultData;
+        let { level, levelName, levelEggNum, userHaveEggNum } = userLevelDto;
+        let data = `当前等级:${level} 等级称号:${levelName} 升级进度:${userHaveEggNum}/${levelEggNum} 我的鹅蛋数量:${availableTotal} `
+        this.logOutput(data);
+    }
+
+    async toWithdraw() {
+        let res = await autoToWithdraw() as IActivityResData;
+        let resultData = res.resultData.data;
+        let { userLevelDto, eggTotal } = resultData;
+        let { level, levelName, levelEggNum, userHaveEggNum } = userLevelDto;
+        let data = `当前等级:${level} 等级称号:${levelName} 升级进度:${userHaveEggNum}/${levelEggNum}  我的鹅蛋数量:${eggTotal}`
+        this.logOutput(data);
+    }
+
+    async toGoldExchange(){
+        let res = await toGoldExchange() as IActivityResData;
+        let resultData = res.resultData.data;
+        let data = "";
+        if(resultData){
+            let { goldTotal, cnumber,rate,availableTotal } = resultData;
+            data = `兑换成功！兑换比例:${rate} 已兑金币:${cnumber} 当前金币:${goldTotal} 剩余鹅蛋数量:${availableTotal}`
+        }else{
+            data = res.resultData.msg;
+        }
+        this.logOutput(data);
+    }
+
+    logOutput(text: string) {
+        let time = DateTime.now().toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
+        let temp = this.state.log;
+        let log = `==${time}==\n${text}${temp}`;
+        temp ? null : `\n` + log;
+        this.setState({
+            log
+        })
+    }
+
     autoGetCK() {
         chrome.runtime.sendMessage({
             type: AUTO_GET_COOKIES
@@ -169,7 +220,6 @@ export default class Goose extends React.Component<IProps, IState, {}> {
             );
         })
     }
-
 
 
     deleteCookie(index: number) {
