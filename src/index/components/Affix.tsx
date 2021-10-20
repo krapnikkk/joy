@@ -1,55 +1,63 @@
 import * as React from 'react'
 import { Affix, Button, Image, Popover } from 'antd';
 import { IAffixData } from '@src/@types';
-import { AFFIX_DATA_URL } from '@src/constants';
+import { inject, observer } from 'mobx-react'
+import emitter from "@event/index";
+import { EVENT_UPDATE_CONFIG } from '@src/constants';
 
 
 interface IState {
-    data: IAffixData[];
+    affixs: IAffixData[];
 }
-interface IProps {
-}
+
+
+@inject('AppStore')
+@observer
 export default class AffixComponent extends React.Component<IProps, IState, {}>  {
     constructor(props: IProps | Readonly<IProps>) {
         super(props);
         this.state = {
-            data: []
+            affixs: []
         };
-        this.loadAffixData();
+    }
+
+    componentWillMount() {
+        emitter.on(EVENT_UPDATE_CONFIG, () => {
+            this.loadAffixData();
+        })
     }
 
     loadAffixData() {
-        fetch(AFFIX_DATA_URL).then(res => res.json()).then((res) => {
-            this.setState({
-                data:res.data
-            })
+        let { affixs } = this.props.AppStore;
+        this.setState({
+            affixs
         })
     }
 
     render() {
         return (<Affix target={() => window} style={{ position: 'absolute', bottom: "230px", right: "50px" }}>
             <section className="affix">{
-                this.state.data.map((item, index) =>
-                    item.hover
+                this.state.affixs.map((affix, index) =>
+                    affix.hover
                         ?
                         <Popover key={index} placement="left"
                             content={(<Image
                                 preview={false}
-                                src={item.image}
-                                width={item.width}
+                                src={affix.image}
+                                width={affix.width}
                             />)
                             } title="" trigger="hover">
                             <Button className="affix-btn" type="primary" onClick={() => {
-                                item.href && window.open(item.href);
+                                affix.href && window.open(affix.href);
                             }}>
-                                {item.name}
+                                {affix.name}
                             </Button>
                         </Popover>
                         :
                         <Button className="affix-btn" type="primary" key={index} onClick={() => {
-                            item.href && window.open(item.href);
+                            affix.href && window.open(affix.href);
                         }}>
-                            {item.name}
+                            {affix.name}
                         </Button>
                 )
             }</section>

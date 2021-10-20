@@ -12,14 +12,17 @@ export const USER_AGENT:string= "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like 
 export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key"]; // "3AB9D23F7A4B3C9B"   
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
 
-export const EXTENSION_VERSION: string = "1.0.0";
-export const AFFIX_DATA_URL:string = "https://krapnik.cn/json/affix.json";
+export const EXTENSION_VERSION: string = "0.0.1";
+export const CONFIG_DATA_URL:string = "https://krapnik.cn/json/setting.json";
 
 //activity
-export const  globalInfo = {
+export const globalInfo = {
     environment: "other",//"jrApp",
     eid: "",
     fp: "",
     channelLv: "clv",
     shareUuid: "uuid",
 };
+
+export const EVENT_UPDATE_CONFIG = "EVENT_UPDATE_CONFIG";
+export const EVENT_UPDATE_INFO = "EVENT_UPDATE_INFO";

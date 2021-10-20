@@ -1,6 +1,6 @@
 import { IAccount } from "@src/@types";
 import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
-import { createAlarms, get, localStoragePromise, minLeftMidnight, openWindow, postChromeMessage, sleep, updateHeader } from "@src/utils";
+import { createAlarms, get, localStoragePromise, minLeftMidnight, openWindow, postChromeMessage, sleep } from "@src/utils";
 import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, HOME_PAGE, MARK, MINUTE_PER_DAY, USER_INFO_URL } from "@src/constants";
 import { autoHarvest, autoToWithdraw, pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange, toWithdraw } from "@src/Activity";
 
@@ -198,11 +198,11 @@ const startActivityTask = async () => {
     }else{
         await queueTask(toWithdraw);
     }
-    await queueTask(pigPetOpenBox);
-    await queueTask(autoHarvest);
+    // await queueTask(pigPetOpenBox);
+    // await queueTask(autoHarvest);
 }
 
-updateHeader({ "Access-Control-Allow-Origin": "*" });
+// updateHeader({ "Access-Control-Allow-Origin": "*" });
 
 
 startScheduleTask();

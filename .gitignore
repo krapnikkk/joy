@@ -2,3 +2,4 @@ note.md
 node_modules
 dist/
 config
+*.zip

@@ -51,3 +51,31 @@ export interface IResultData {
     data: { [key: string]: Record };
     msg: srting;
 }
+
+export interface IConfig {
+    affix: IAffix[];
+    version: string;
+    info: IInfo;
+}
+
+export interface IInfo {
+    verison: string;
+    download: string;
+    content: string;
+}
+
+export interface IAffix {
+    name; string;
+    icon?: string;
+    href?: string;
+    hover?: boolean;
+    image?: string;
+    width?: number
+}
+
+// export { };
+declare global {
+    export interface IProps {
+        [key: string]: any
+    }
+}
