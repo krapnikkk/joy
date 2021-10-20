@@ -47,11 +47,11 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             browsemarketingDisable: true,
         };
         // this.addEvent();
-        this.getAccountInfo();
     }
 
     public componentDidMount() {
         // console.log("componentDidMount");
+        this.getAccountInfo();
     }
 
     render() {
@@ -237,7 +237,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         for (let i = 0; i < this.state.accountInfo.length; i++) {
             let account = this.state.accountInfo[i];
             let currentAccount = account.curPin;
-            let {cookie} = account
+            let { cookie } = account
             await this.setStateAsync({ currentAccount });
             // await sleep(3000);
             let res = await getTaskDetail(cookie) as IBaseResData;
@@ -292,7 +292,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                     case 26:
                         data += "========点击【营销活动】按钮即可完成以下任务========\n";
                         this.setState({
-                            browseBrandDisable: false
+                            browsemarketingDisable: false
                         })
                         break;
                     case 29:
@@ -320,9 +320,9 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
             let body = await this.getSourceRes(cookie);
-            let res = await collectAtuoScore(body) as IBaseResData;
+            let res = await collectAtuoScore(body,cookie) as IBaseResData;
             let result = res.data.result as ICollectAtuoScore;
-            let { produceScore } = result
+            let { produceScore } = result;
             let data = `已收取金币：${produceScore}`;
             this.logOutput(data);
         }
@@ -361,9 +361,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             let delay = rnd(1, 3) * 1000;
                             await sleep(delay);
                             let res = await collectScore(body, cookie) as IBaseResData;
-                            let result = res.data.result as ICollectScore;
-                            let { userScore, maxTimes, times, score } = result;
-                            log = `任务进度：${times}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            let { success } = res.data;
+                            if(success){
+                                let result = res.data.result as ICollectScore;
+                                let { userScore, maxTimes, times, score } = result;
+                                log = `任务进度：${times}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            }else{
+                                log = res.msg;
+                            }
                             this.logOutput(log);
                         }
                         log = "当前账号已经完成该任务啦！";
@@ -409,9 +414,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             await sleep(8000); // 等待10s
                             body = await this.getSourceRes(cookie, { taskId, taskToken });
                             let res = await collectScore(body, cookie) as IBaseResData;
-                            let result = res.data.result as ICollectScore;
-                            let { userScore, score } = result;
-                            log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            let { success } = res.data;
+                            if(success){
+                                let result = res.data.result as ICollectScore;
+                                let { userScore, score } = result;
+                                log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            }else{
+                                log = res.msg;
+                            }
                             this.logOutput(log);
                         }
                         log = "当前账号已经完成该任务啦！";
@@ -457,9 +467,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             await sleep(8000); // 等待10s
                             body = await this.getSourceRes(cookie, { taskId, taskToken });
                             let res = await collectScore(body, cookie) as IBaseResData;
-                            let result = res.data.result as ICollectScore;
-                            let { userScore, score } = result;
-                            log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            let { success } = res.data;
+                            if(success){
+                                let result = res.data.result as ICollectScore;
+                                let { userScore, score } = result;
+                                log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            }else{
+                                log = res.msg;
+                            }
                             this.logOutput(log);
                         }
                         log = "当前账号已经完成该任务啦！";
@@ -472,12 +487,18 @@ export default class Travel extends React.Component<IProps, IState, {}> {
     }
 
     async browseActivity(type: number) {
+        if (type == 26) {
+            this.setState({
+                browsemarketingDisable: true,
 
-        this.setState({
-            browseActivityDisable: type == 3,
-            browsemarketingDisable: type == 26,
+            })
+        }
+        if (type == 3) {
+            this.setState({
+                browseActivityDisable: true,
 
-        })
+            })
+        }
         for (let i = 0; i < this.state.accountInfo.length; i++) {
             let account = this.state.accountInfo[i];
             let currentAccount = account.curPin;
@@ -510,9 +531,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                 body = await this.getSourceRes(cookie, { taskId, taskToken });
                                 res = await collectScore(body, cookie) as IBaseResData;
                             }
-                            let result = res.data.result as ICollectScore;
-                            let { userScore, score } = result;
-                            log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            let { success } = res.data;
+                            if(success){
+                                let result = res.data.result as ICollectScore;
+                                let { userScore, score } = result;
+                                log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            }else{
+                                log = res.msg;
+                            }
                             this.logOutput(log);
                         }
                         log = "当前账号已经完成该任务啦！";
@@ -555,9 +581,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             let delay = rnd(1, 3) * 1000;
                             await sleep(delay);
                             let res = await collectScore(body, cookie) as IBaseResData;
-                            let result = res.data.result as ICollectScore;
-                            let { userScore, maxTimes, times, score } = result;
-                            log = `任务进度：${times}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            let { success } = res.data;
+                            if(success){
+                                let result = res.data.result as ICollectScore;
+                                let { userScore, maxTimes, times, score } = result;
+                                log = `任务进度：${times}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            }else{
+                                log = res.msg;
+                            }
                             this.logOutput(log);
                         }
                         log = "当前账号已经完成该任务啦！";
