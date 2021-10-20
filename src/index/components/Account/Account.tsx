@@ -1,13 +1,15 @@
-import { Avatar, Button, Input, List, message, PageHeader, Tooltip } from 'antd';
+import { Avatar, Button, Drawer, Input, List, message, PageHeader, Tooltip } from 'antd';
 import * as React from 'react'
 import './Account.css';
 import { QuestionCircleOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { AUTO_GET_COOKIES, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
 import { copyText, localStoragePromise } from '@src/utils';
 import { IAccount } from '@src/@types';
+import TextArea from 'antd/lib/input/TextArea';
 
 interface IState {
   accountInfo: IAccount[];
+  visibile: boolean;
 }
 interface IProps {
 }
@@ -16,7 +18,8 @@ export default class Account extends React.Component<IProps, IState, {}> {
   constructor(props: IProps | Readonly<IProps>) {
     super(props);
     this.state = {
-      accountInfo: []
+      accountInfo: [],
+      visibile: false
     };
     this.addEvent();
     this.getAccountInfoAsync();
@@ -74,7 +77,7 @@ export default class Account extends React.Component<IProps, IState, {}> {
               ><QuestionCircleOutlined />
               </Tooltip>
             </Button>,
-            <Button key="3" disabled>
+            <Button key="3" onClick={this.showDrawer.bind(this)}>
               文本导入
               <Tooltip
                 placement="bottom"
@@ -121,8 +124,33 @@ export default class Account extends React.Component<IProps, IState, {}> {
             </List.Item>
           )}
         />
+
+        <Drawer title="请输入你的cookie"
+          placement="bottom"
+          height="350"
+          onClose={this.onClose.bind(this)}
+          visible={this.state.visibile}>
+          <TextArea rows={6} placeholder={"回车键换行，一行一个账号进行解析"} />
+          <Button style={{ marginTop: "10px" }} type="primary" onClick={this.importCookie.bind(this)}>批量导入</Button>
+        </Drawer>
       </section>
     )
+  }
+
+  onClose() {
+    this.setState({
+      visibile: false
+    })
+  }
+
+  showDrawer() {
+    this.setState({
+      visibile: true
+    })
+  }
+
+  importCookie() {
+
   }
 
   autoGetCK() {
