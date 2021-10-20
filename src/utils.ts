@@ -196,7 +196,7 @@ export const _get = (url: string, header?: { [key: string]: string }) => {
 
 export const get = async (url: string, header?: { [key: string]: string }) => {
     let handler = updateHeader(header);
-    await sleep(500);
+    await sleep(750);
     let res = await _get(url, header);
     removeHeader(handler);
     return res;
@@ -273,9 +273,9 @@ export const getSignature = (signData: {}) => {
     }
 }
 
-export const getReqData = (signData: {}, sign: boolean = true,args:{} = {}) => {
+export const getReqData = (signData: {}, sign: boolean = true, args: {} = {}) => {
     let signature = sign ? getSignature(signData) : null;
-    Object.assign(signData,args);
+    Object.assign(signData, args);
     let reqData = {
         ...signData,
         "timeSign": Math.random(),
@@ -316,4 +316,12 @@ export const minLeftMidnight = function (): number {
 
 export const timeNow = () => {
     return Math.round(Date.now() / 1000) + GMT * 3600;
+}
+
+export const getRandom = (): string => {
+    return Math.floor(1e6 * Math.random()).toString();
+}
+
+export const rnd = (min: number, max: number) => {
+	return Math.floor(Math.random() * (max - min + 1) + min);
 }

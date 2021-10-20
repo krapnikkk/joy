@@ -27,7 +27,7 @@ const App: React.FC = () => (
         </section>
       </Header>
       <Content className="content">
-        <Redirect to="/activity" />
+        <Redirect to="/account" />
         {
           Routes.map((route, index) =>
             <Route key={index} path={route.path} component={route.component} />

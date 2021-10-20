@@ -11,6 +11,12 @@ export interface IEvent {
     data?: {}
 }
 
+export interface ILocalStorageData{
+    account:{
+        [key:string]:IAccount
+    }
+}
+
 export interface IAccount {
     accountType: string;
     baseInfoStatus: string;
@@ -52,6 +58,20 @@ export interface IResultData {
     msg: srting;
 }
 
+// action_activity
+export interface IBaseResData {
+    code: number;
+    data: IActionData;
+    msg: string;
+}
+
+export interface IActionData {
+    bizCode: number;
+    bizMsg: string;
+    result: { [key: string]: Record };
+    success: boolean;
+}
+
 export interface IConfig {
     affix: IAffix[];
     version: string;
@@ -73,7 +93,6 @@ export interface IAffix {
     width?: number
 }
 
-// export { };
 declare global {
     export interface IProps {
         [key: string]: any

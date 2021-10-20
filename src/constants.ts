@@ -11,8 +11,9 @@ export const GMT: number = +8;
 export const USER_AGENT:string= "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
 export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key"]; // "3AB9D23F7A4B3C9B"   
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
+export const ACTION_HOST:string = "https://api.m.jd.com/client.action?functionId=";
 
-export const EXTENSION_VERSION: string = "0.0.1";
+export const EXTENSION_VERSION: string = "0.0.2";
 export const CONFIG_DATA_URL:string = "https://krapnik.cn/json/setting.json";
 
 //activity

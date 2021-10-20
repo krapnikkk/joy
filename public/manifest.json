@@ -2,7 +2,7 @@
   "name": "Joy",
   "short_name": "Joy",
   "manifest_version": 2,
-  "homepage_url": "https://github.com/krapnikkk/",
+  "homepage_url": "https://github.com/krapnikkk/joy",
   "icons": {
     "32": "32x32.png",
     "64": "64x64.png",

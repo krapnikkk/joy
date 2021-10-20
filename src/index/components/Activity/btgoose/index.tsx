@@ -186,7 +186,7 @@ export default class Goose extends React.Component<IProps, IState, {}> {
         let time = DateTime.now().toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
         let temp = this.state.log;
         let log = `==${time}==\n${text}${temp}`;
-        temp ? null : `\n` + log;
+        log = `\n` + log;
         this.setState({
             log
         })

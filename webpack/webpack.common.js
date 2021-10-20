@@ -140,6 +140,7 @@ module.exports = {
     alias: {
       "@ant-design/icons/lib/dist$": path.resolve(__dirname, "../src/icons.ts"),
       "@src": path.resolve(__dirname, "../src"),
+      "@event": path.resolve(__dirname, "../src/index/event"),
     },
   },
   plugins: [

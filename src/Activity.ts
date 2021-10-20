@@ -1,4 +1,4 @@
-import { GENERIC_JR_HOST, globalInfo, USER_AGENT } from "./constants";
+import { ACTION_HOST, GENERIC_JR_HOST, globalInfo, USER_AGENT } from "./constants";
 import { get, getReqData, post } from "./utils";
 
 export const toWithdraw = (cookie?: string) => {
@@ -83,7 +83,7 @@ export const toDailyHome = (cookie?: string) => {
         environment,
         shareUuid,
     };
-    let reqData = getReqData(signData, false, {riskDeviceInfo});
+    let reqData = getReqData(signData, false, { riskDeviceInfo });
     let url = `${GENERIC_JR_HOST}toDailyHome?reqData=${reqData}`;
     let header = {
         "User-Agent": USER_AGENT,
@@ -154,4 +154,97 @@ export const autoHarvest = async (cookie: string, key: string) => {
     userInfoMap[key] = res.resultData.data;
     return harvest(key, cookie);
 
+}
+
+// 热爱环游记
+export const getHomeData = async (cookie?: string) => {
+    let functionId = "travel_getHomeData";
+    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const getTaskDetail = async (cookie?: string) => {
+    let functionId = "travel_getTaskDetail";
+    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const collectScore = async (body: string, cookie?: string) => {
+    let functionId = "travel_collectScore";
+    let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+
+export const collectAtuoScore = async (body: string, cookie?: string) => {
+    let functionId = "travel_collectAtuoScore";
+    let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const getFeedDetail = async (taskId:number,cookie?: string) => {
+    let functionId = "travel_getFeedDetail";
+    let data = `functionId=${functionId}&body=${JSON.stringify({taskId})}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const raise= async (cookie?: string) => {
+    let functionId = "travel_raise";
+    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const sign = async (cookie?: string) => {
+    let functionId = "travel_sign";
+    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
 }
