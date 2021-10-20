@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "baseUrl": "./",
     "outDir": "build/dist",
     "module": "esnext",
@@ -23,7 +24,10 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "paths": {
-      "@src/*": ["./src/*"]
+      "@src/*": ["./src/*"],
+      "@event/*": [
+        "./src/index/event/*"
+      ]
     }
   },
   "exclude": [
