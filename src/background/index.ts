@@ -19,7 +19,7 @@ chrome.browserAction.onClicked.addListener(function () {
 chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install') {
         // install
-        // chrome.tabs.create({url: 'disclaimer.html'})
+        chrome.tabs.create({url: 'index.html#/about'})
     }
     if (details.reason === 'update') {
         // 更新事件

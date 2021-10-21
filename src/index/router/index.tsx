@@ -1,3 +1,4 @@
+import About from "../components/About/About";
 import Account from "../components/Account/Account"
 import Activity from "../components/Activity/Activity";
 import Coupon from "../components/Coupon/Coupon";
@@ -19,5 +20,9 @@ export const Routes = [
     {
         path: '/setting',
         component: Setting
+    },
+    {
+        path: '/about',
+        component: About
     }
 ];
