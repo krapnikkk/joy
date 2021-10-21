@@ -1,11 +1,8 @@
 import * as React from 'react';
-// import { Button, Card, Dropdown, Menu, message, PageHeader, Radio, Switch, Tooltip } from 'antd';
-import { Button, Card, message, PageHeader } from 'antd';
-// import { QuestionCircleOutlined, UserOutlined, DownOutlined } from "@ant-design/icons";
+import { Button, Card, message, PageHeader, Radio, RadioChangeEvent, Switch } from 'antd';
 import { getRandom, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
 import { IAccount, IBaseResData, ILocalStorageData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
-import './index.css';
 import TextArea from 'antd/lib/input/TextArea';
 import { collectAtuoScore, collectScore, getFeedDetail, getHomeData, getTaskDetail, raise, sign } from '@src/Activity';
 import { DateTime } from 'luxon';
@@ -24,6 +21,8 @@ interface IState {
     browseActivityDisable: boolean;
     browseBrandDisable: boolean;
     browsemarketingDisable: boolean;
+    scheduleSwitch: boolean;
+    scheduleSpan: number;
 
 }
 interface IProps {
@@ -45,12 +44,12 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             browseActivityDisable: true,
             browseBrandDisable: true,
             browsemarketingDisable: true,
+            scheduleSwitch: false,
+            scheduleSpan: 1
         };
-        // this.addEvent();
     }
 
     public componentDidMount() {
-        // console.log("componentDidMount");
         this.getAccountInfo();
     }
 
@@ -73,7 +72,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                     </Card>
                     <Card>
                         <section className="setting-item">
-                            <section className="operation">
+                            <section>
                                 <Button type="primary" onClick={() => {
                                     this.getTaskDetail();
                                 }}>
@@ -119,60 +118,31 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                 }}>
                                     营销活动
                                 </Button>
-
-                                {/* 当前账号：<Dropdown overlay={() => {
-                                    return (<Menu onClick={this.handleMenuClick.bind(this)}>
-                                        {
-                                            this.state.accountInfo.map((account, idx) => (
-                                                <Menu.Item key={idx} icon={<UserOutlined />}>
-                                                    {account.nickname}
-                                                </Menu.Item>
-                                            ))
-                                        }
-                                    </Menu>)
-                                }} trigger={['click']}>
-                                    <Button>
-                                        全部账号 <DownOutlined />
-                                    </Button>
-                                </Dropdown> */}
+                            </section>
+                            <section>
+                                定时收取金币：
+                                <Switch
+                                    size="small"
+                                    checked={this.state.scheduleSwitch}
+                                    defaultChecked={this.state.scheduleSwitch}
+                                    onChange={this.onScheduleSwitchChange.bind(this)}
+                                />
+                            </section>
+                            <section>
+                                定时间隔(分)：
+                                <Radio.Group
+                                    size="small"
+                                    onChange={this.onScheduleSpanChange.bind(this)}
+                                    value={this.state.scheduleSpan}
+                                    disabled={this.state.scheduleSwitch}
+                                >
+                                    <Radio value={1}>30</Radio>
+                                    <Radio value={2}>60</Radio>
+                                </Radio.Group>
                             </section>
                             <TextArea rows={10} value={this.state.log} />
                         </section>
-                        {/* <section className="setting-item">
-                            <p>
-                                开启后台任务：
-                                <Tooltip
-                                    placement="top"
-                                    title="控制是否使用当前账号接受服务器指令调度浏览指定帖子的开关"
-                                >
-                                    <QuestionCircleOutlined />
-                                </Tooltip>
-                                <Switch
-                                    size="small"
-                                    checked={false}
-                                    defaultChecked={false}
-                                // onChange={this.onScheduleSwitchChange.bind(this)}
-                                />
-                            </p>
-                            <p>
-                                定时间隔(分)：
-                                <Tooltip
-                                    placement="top"
-                                    title="每次接受服务器指令调度浏览帖子的时间间隔"
-                                >
-                                    <QuestionCircleOutlined />
-                                </Tooltip>
-                            </p>
-                            <Radio.Group
-                                size="small"
-                                // onChange={this.onScheduleSpanChange.bind(this)}
-                                value="{this.state.scheduleSpan}"
-                                disabled={false}
-                            >
-                                <Radio value={1}>5</Radio>
-                                <Radio value={2}>10</Radio>
-                            </Radio.Group>
-                        </section> */}
+
                     </Card>
                 </Content>
             </section>
@@ -196,7 +166,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
             let body = await this.getSourceRes(cookie);
-            let res = await sign(body,cookie) as IBaseResData;
+            let res = await sign(body, cookie) as IBaseResData;
             let { success } = res.data;
             let data = "";
             if (success) {
@@ -254,7 +224,6 @@ export default class Travel extends React.Component<IProps, IState, {}> {
 
     initTaskVos(taskVos: ITaskVos[]) {
         let data = "当前任务情况：\n";
-        // taskVos.forEach((taskVos) => {
         for (let i = 0; i < taskVos.length; i++) {
             let taskVo = taskVos[i]
             let { taskType, maxTimes, times, taskName } = taskVo;
@@ -298,6 +267,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                         break;
                     case 29:
                         // todo
+
                         break;
                     // case 21:
                     //     入会
@@ -308,7 +278,6 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             }
 
             data += `【${taskName}】 任务进度：${times}/${maxTimes}\n`;
-            // })
         }
 
         return data;
@@ -321,7 +290,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
             let body = await this.getSourceRes(cookie);
-            let res = await collectAtuoScore(body,cookie) as IBaseResData;
+            let res = await collectAtuoScore(body, cookie) as IBaseResData;
             let result = res.data.result as ICollectAtuoScore;
             let { produceScore } = result;
             let data = `已收取金币：${produceScore}`;
@@ -329,7 +298,6 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         }
         this.showMessage("success", "任务已完成！");
     }
-
 
     async addProduct() {
         this.setState({
@@ -363,11 +331,11 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             await sleep(delay);
                             let res = await collectScore(body, cookie) as IBaseResData;
                             let { success } = res.data;
-                            if(success){
+                            if (success) {
                                 let result = res.data.result as ICollectScore;
                                 let { userScore, maxTimes, times, score } = result;
                                 log = `任务进度：${times}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
-                            }else{
+                            } else {
                                 log = res.msg;
                             }
                             this.logOutput(log);
@@ -416,11 +384,11 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             body = await this.getSourceRes(cookie, { taskId, taskToken });
                             let res = await collectScore(body, cookie) as IBaseResData;
                             let { success } = res.data;
-                            if(success){
+                            if (success) {
                                 let result = res.data.result as ICollectScore;
                                 let { userScore, score } = result;
                                 log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
-                            }else{
+                            } else {
                                 log = res.msg;
                             }
                             this.logOutput(log);
@@ -469,11 +437,11 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             body = await this.getSourceRes(cookie, { taskId, taskToken });
                             let res = await collectScore(body, cookie) as IBaseResData;
                             let { success } = res.data;
-                            if(success){
+                            if (success) {
                                 let result = res.data.result as ICollectScore;
                                 let { userScore, score } = result;
                                 log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
-                            }else{
+                            } else {
                                 log = res.msg;
                             }
                             this.logOutput(log);
@@ -533,11 +501,11 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                 res = await collectScore(body, cookie) as IBaseResData;
                             }
                             let { success } = res.data;
-                            if(success){
+                            if (success) {
                                 let result = res.data.result as ICollectScore;
                                 let { userScore, score } = result;
                                 log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
-                            }else{
+                            } else {
                                 log = res.msg;
                             }
                             this.logOutput(log);
@@ -583,11 +551,11 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             await sleep(delay);
                             let res = await collectScore(body, cookie) as IBaseResData;
                             let { success } = res.data;
-                            if(success){
+                            if (success) {
                                 let result = res.data.result as ICollectScore;
                                 let { userScore, maxTimes, times, score } = result;
                                 log = `任务进度：${times}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
-                            }else{
+                            } else {
                                 log = res.msg;
                             }
                             this.logOutput(log);
@@ -633,11 +601,6 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         await this.setStateAsync({ accountInfo })
     }
 
-
-    handleMenuClick(idx: number) {
-        console.log(idx);
-    }
-
     setStateAsync(state: Readonly<IProps>) {
         return new Promise<void>((resolve) => {
             this.setState(state, resolve)
@@ -662,4 +625,34 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         }
         return JSON.stringify(body);
     }
+
+    timer: number = 0;
+    onScheduleSpanChange(e: RadioChangeEvent) {
+        let scheduleSpan = e.target.value;
+        this.setState({ scheduleSpan});
+    }
+
+    onScheduleSwitchChange(checked: boolean) {
+        this.setState({scheduleSwitch: checked});
+        
+        let log = "";
+        if (checked) {
+            let timeout = this.state.scheduleSpan == 1 ? 30 * 60 * 1000 : 60 * 60 * 1000;
+            this.timer = window.setInterval(() => {
+                this.collectAtuoScore();
+            },timeout);
+            log = "已开启定时自动收取金币";
+        } else {
+            window.clearInterval(this.timer);
+            log = "已关闭定时自动收取金币";
+        }
+        this.logOutput(log);
+    }
+
+    componentWillUnmount = () => {
+        this.setState = (state, callback) => {
+            return;
+        };
+    }
+
 }
