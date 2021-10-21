@@ -19,14 +19,11 @@ export default class AffixComponent extends React.Component<IProps, IState, {}> 
         this.state = {
             affixs: []
         };
-    }
-
-    componentWillMount() {
         emitter.on(EVENT_UPDATE_CONFIG, () => {
             this.loadAffixData();
         })
     }
-
+    
     loadAffixData() {
         let { affixs } = this.props.AppStore;
         this.setState({

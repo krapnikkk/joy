@@ -22,9 +22,6 @@ export default class ModalComponent extends React.Component<IProps, IState, {}> 
             content: "",
             force: false
         };
-    }
-
-    componentWillMount() {
         emitter.on(EVENT_UPDATE_INFO, () => {
             this.loadInfoData();
         })
