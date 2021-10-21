@@ -182,7 +182,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                     let badgeAwardVo = badgeAwardVos[j];
                     let { status ,awardName} = badgeAwardVo;
                     if (status != 3) {
-                        log = `任务${awardName}未达标或已经领取啦！`;
+                        log = `任务【${awardName}】未达标或已经领取啦！`;
                         this.logOutput(log);
                     } else {
                         let { awardToken } = badgeAwardVo;
