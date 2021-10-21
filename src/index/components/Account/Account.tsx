@@ -2,7 +2,7 @@ import { Avatar, Button, Drawer, Input, List, message, PageHeader, Tooltip } fro
 import * as React from 'react'
 import './Account.css';
 import { QuestionCircleOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import { AUTO_GET_COOKIES, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
+import { AUTO_GET_COOKIES, EXPORT, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
 import { copyText, localStoragePromise } from '@src/utils';
 import { IAccount } from '@src/@types';
 import TextArea from 'antd/lib/input/TextArea';
@@ -10,6 +10,7 @@ import TextArea from 'antd/lib/input/TextArea';
 interface IState {
   accountInfo: IAccount[];
   visibile: boolean;
+  value:string;
 }
 interface IProps {
 }
@@ -19,7 +20,8 @@ export default class Account extends React.Component<IProps, IState, {}> {
     super(props);
     this.state = {
       accountInfo: [],
-      visibile: false
+      visibile: false,
+      value:""
     };
     this.addEvent();
     this.getAccountInfoAsync();
@@ -130,7 +132,7 @@ export default class Account extends React.Component<IProps, IState, {}> {
           height="350"
           onClose={this.onClose.bind(this)}
           visible={this.state.visibile}>
-          <TextArea rows={6} placeholder={"回车键换行，一行一个账号进行解析"} />
+          <TextArea rows={6} value={this.state.value} placeholder={"回车键换行，一行一个账号进行解析"} onChange={this.onChange.bind(this)}/>
           <Button style={{ marginTop: "10px" }} type="primary" onClick={this.importCookie.bind(this)}>批量导入</Button>
         </Drawer>
       </section>
@@ -150,6 +152,11 @@ export default class Account extends React.Component<IProps, IState, {}> {
   }
 
   importCookie() {
+    let {value} = this.state;
+    chrome.runtime.sendMessage({
+      type: EXPORT,
+      data:value
+    })
 
   }
 
@@ -162,6 +169,13 @@ export default class Account extends React.Component<IProps, IState, {}> {
   login() {
     chrome.runtime.sendMessage({
       type: LOGIN
+    })
+  }
+
+  onChange(e:any){
+    let {value} = e.target;
+    this.setState({
+      value
     })
   }
 
@@ -195,8 +209,6 @@ export default class Account extends React.Component<IProps, IState, {}> {
       );
     })
   }
-
-
 
   deleteCookie(index: number) {
     let curPin = this.state.accountInfo[index].curPin;

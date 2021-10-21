@@ -236,9 +236,9 @@ export const raise= async (cookie?: string) => {
     return post(url, data, header);
 }
 
-export const sign = async (cookie?: string) => {
+export const sign = async (body: string,cookie?: string) => {
     let functionId = "travel_sign";
-    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
+    let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
         "User-Agent": USER_AGENT,

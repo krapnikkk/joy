@@ -1,5 +1,5 @@
 import { IAccount } from "@src/@types";
-import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
+import { AUTO_GET_COOKIES, CLOSE_LOGIN_WINDOW, EXPORT, GET_COOKIES_SUCCESS, LOGIN, LOGIN_SUCCESS, REQUEST } from "../Events";
 import { createAlarms, get, localStoragePromise, minLeftMidnight, openWindow, postChromeMessage, sleep } from "@src/utils";
 import { ACTIVITY_TASK_INTERVAL, COOKIE_KEYS, HOME_PAGE, MARK, MINUTE_PER_DAY, USER_INFO_URL } from "@src/constants";
 import { autoHarvest, autoToWithdraw, pigPetOpenBox, toDailyHome, toDailySignIn, toGoldExchange, toWithdraw } from "@src/Activity";
@@ -32,7 +32,7 @@ let tempCookies: chrome.cookies.Cookie[] = [];
 let loginFlag: boolean = false;//是否开启cookie隔离模式
 const getCookie = () => {
     return new Promise<void>((resolve, reject) => {
-        chrome.cookies.getAll({ 'domain': '.jd.com' }, function (cookies) {
+        chrome.cookies.getAll({ 'domain': '.jd.com' }, async function (cookies) {
             let ck = "";
             cookies.forEach((cookie) => {
                 if (COOKIE_KEYS.includes(cookie.name)) {
@@ -41,31 +41,47 @@ const getCookie = () => {
             })
             if (ck) {
                 // 校验ck有效性
-                getUserInfo(ck).then((res: Object) => {
-                    Object.assign(res, { cookie: ck, createDate: Date.now() });
-                    let curPin: string = res['curPin'];
-                    localStoragePromise.get("account").then((storage: any) => {
-                        let account = storage.account || {};
-                        if (account[curPin]) {
-                            console.log("覆盖");
-                        }
-                        account[curPin] = res;
-                        localStoragePromise.set({
-                            account
-                        }).then(() => {
-                            postChromeMessage({ type: GET_COOKIES_SUCCESS });
-                        });
-                    });
-
-                }).catch((e) => {
-                    console.warn(e);
-                });
+                await checkCookie(ck);
             } else {
                 openLoginWindow();
             }
             resolve();
         });
     })
+}
+
+const checkCookie = (cookie: string) => {
+    return new Promise<void>((resolve)=> {
+        getUserInfo(cookie).then((res: Object) => {
+            Object.assign(res, { cookie, createDate: Date.now() });
+            let curPin: string = res['curPin'];
+            localStoragePromise.get("account").then((storage: any) => {
+                let account = storage.account || {};
+                if (account[curPin]) {
+                    console.log("覆盖");
+                }
+                account[curPin] = res;
+                localStoragePromise.set({
+                    account
+                }).then(() => {
+                    postChromeMessage({ type: GET_COOKIES_SUCCESS });
+                });
+                resolve();
+            });
+        }).catch((e) => {
+            console.warn(e);
+        });
+    })
+}
+
+const exportCookie = async (value: string) => {
+    let cookies = value.split("\n");
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i];
+        if (cookie) {
+            await checkCookie(cookie);
+        }
+    }
 }
 
 const openLoginWindow = (login: boolean = false) => {
@@ -138,7 +154,8 @@ const queueTask = (task: Function) => {
 
 // 事件监听
 chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
-    switch (request.type) {
+    let {data,type} = request;
+    switch (type) {
         case AUTO_GET_COOKIES:
             getCookie();
             break;
@@ -165,6 +182,9 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
                 restoreCookies();
             }
             break;
+            case EXPORT:
+                exportCookie(data);
+                break;
         case REQUEST:
             break;
         default:
@@ -195,7 +215,7 @@ const startActivityTask = async () => {
     if (!dailySignInFlag) {
         await queueTask(autoToWithdraw);
         dailySignInFlag = true;
-    }else{
+    } else {
         await queueTask(toWithdraw);
     }
     // await queueTask(pigPetOpenBox);
