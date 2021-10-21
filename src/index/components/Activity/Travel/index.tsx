@@ -569,16 +569,17 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         this.showMessage("success", "任务已完成！");
     }
 
-    logOutput(text: string) {
-        let { currentAccount, accountMap } = this.state;
-        let { nickname } = accountMap[currentAccount];
+    logOutput(text: string, withName: boolean = true) {
+        let log = "";
         let time = DateTime.now().toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
-        let temp = this.state.log;
-        let log = `==${time}==\n【${nickname}】${text}${temp}`;
-        log = `\n` + log;
-        this.setState({
-            log
-        })
+        log = `==${time}==\n`;
+        if (withName) {
+            let { currentAccount, accountMap } = this.state;
+            let { nickname } = accountMap[currentAccount];
+            log += `【${nickname}】`
+        }
+        log += `${text}${this.state.log}\n`;
+        this.setState({ log })
     }
 
     showMessage(type: string, content: string, duration: number = 1) {
@@ -629,24 +630,23 @@ export default class Travel extends React.Component<IProps, IState, {}> {
     timer: number = 0;
     onScheduleSpanChange(e: RadioChangeEvent) {
         let scheduleSpan = e.target.value;
-        this.setState({ scheduleSpan});
+        this.setState({ scheduleSpan });
     }
 
     onScheduleSwitchChange(checked: boolean) {
-        this.setState({scheduleSwitch: checked});
-        
+        this.setState({ scheduleSwitch: checked });
         let log = "";
         if (checked) {
             let timeout = this.state.scheduleSpan == 1 ? 30 * 60 * 1000 : 60 * 60 * 1000;
             this.timer = window.setInterval(() => {
                 this.collectAtuoScore();
-            },timeout);
+            }, timeout);
             log = "已开启定时自动收取金币";
         } else {
             window.clearInterval(this.timer);
             log = "已关闭定时自动收取金币";
         }
-        this.logOutput(log);
+        this.logOutput(log, false);
     }
 
     componentWillUnmount = () => {
