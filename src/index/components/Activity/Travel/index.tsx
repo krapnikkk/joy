@@ -175,21 +175,23 @@ export default class Travel extends React.Component<IProps, IState, {}> {
 
                 let taskDetail = this.state.taskDetailMap[currentAccount];
                 let { lotteryTaskVos } = taskDetail;
-                let { badgeAwardVos, maxTimes, times } = lotteryTaskVos[0];//看起来只有一个的样子
+                let { badgeAwardVos } = lotteryTaskVos[0];//看起来只有一个的样子
                 let log = "";
-                if (maxTimes <= times) {
-                    log = "当前账号已经完成该任务啦！";
-                    this.logOutput(log);
-                } else {
-                    for (let j = 0; j < badgeAwardVos.length; j++) {
-                        let badgeAwardVo = badgeAwardVos[j];
-                        let { awardToken, awardName } = badgeAwardVo;
+
+                for (let j = 0; j < badgeAwardVos.length; j++) {
+                    let badgeAwardVo = badgeAwardVos[j];
+                    let { status ,awardName} = badgeAwardVo;
+                    if (status != 3) {
+                        log = `任务${awardName}未达标或已经领取啦！`;
+                        this.logOutput(log);
+                    } else {
+                        let { awardToken } = badgeAwardVo;
                         let body = await this.getSourceRes(cookie, { awardToken });
-                        let delay = rnd(1, 3) * 1000;
-                        await sleep(delay);
-                        log = `任务：【${awardName}】浏览中，随机延时提交中`;
+                        log = `任务：【${awardName}】领取中`;
                         this.logOutput(log);
                         let res = await getBadgeAward(body, cookie) as IBaseResData;
+                        
+                        await this.throlle();
                         let { success } = res.data;
                         if (success) {
                             let myAwardVo = res.data.result.myAwardVos[0] as IMyAwardVos;
@@ -279,12 +281,10 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 let shop = shoppingActivityVos[j];
                 let { taskToken, title } = shop;
                 let body = await this.getSourceRes(cookie, { taskId, taskToken, actionType: 1 });
-                let delay = rnd(1, 3) * 1000;
-                await sleep(delay);
-                log = `任务：【${title}】浏览中，随机延时提交中`;
-                this.logOutput(log);
-
+                log = `任务：【${title}】浏览中。。。`;
                 let res = await collectScore(body, cookie) as IBaseResData;
+                this.logOutput(log);
+                await this.throlle();
                 if (waitDuration != 0) {
                     body = await this.getSourceRes(cookie, { taskId, taskToken });
                     res = await collectScore(body, cookie) as IBaseResData;
@@ -464,12 +464,11 @@ export default class Travel extends React.Component<IProps, IState, {}> {
 
                 let body = "";
                 body = await this.getSourceRes(cookie, { taskId, taskToken, actionType: 1 });
-                let delay = rnd(1, 3) * 1000;
-                await sleep(delay);
-                await collectScore(body, cookie) as IBaseResData;
-                log = `任务：【${taskName}】浏览中，模拟浏览${waitDuration}s`;
+                await this.throlle();
+                log = `任务：【${taskName}】浏览中。。。`;
                 this.logOutput(log);
-                await sleep(waitDuration * 1000);
+                await collectScore(body, cookie) as IBaseResData;
+                await this.throlle(waitDuration);
                 body = await this.getSourceRes(cookie, { taskId, taskToken });
                 let res = await collectScore(body, cookie) as IBaseResData;
                 let { success } = res.data;
@@ -515,8 +514,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 }
                 let { taskToken } = item;
                 let body = await this.getSourceRes(cookie, { taskId, taskToken });
-                let delay = rnd(1, 3) * 1000;
-                await sleep(delay);
+                await this.throlle();
 
                 let res = await collectScore(body, cookie) as IBaseResData;
                 let { success } = res.data;
@@ -541,8 +539,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         this.logOutput(log);
         let { taskToken } = simpleRecordInfoVo;
         let body = await this.getSourceRes(cookie, { taskId, taskToken });
-        let delay = rnd(1, 3) * 1000;
-        await sleep(delay);
+        await this.throlle();
 
         let res = await collectScore(body, cookie) as IBaseResData;
         let { success } = res.data;
@@ -558,4 +555,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         log = "当前账号已经完成该任务啦！";
         this.logOutput(log);
     }
+
+    async throlle(delay?: number) {
+        if (!delay) {
+            delay = rnd(1, 3);
+        }
+        let log = `随机模拟等待中,${delay}秒后提交~`;
+        this.logOutput(log);
+        await sleep(delay * 1000);
+    }
+
 }
