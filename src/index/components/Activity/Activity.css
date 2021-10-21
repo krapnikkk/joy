@@ -1,0 +1,12 @@
+.activity-content{
+    display: flex;
+}
+
+.ant-btn{
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.setting-item > section{
+    margin-bottom: 10px;
+}
