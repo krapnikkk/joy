@@ -195,7 +195,8 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             let currentAccount = account.curPin;
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
-            let res = await sign(cookie) as IBaseResData;
+            let body = await this.getSourceRes(cookie);
+            let res = await sign(body,cookie) as IBaseResData;
             let { success } = res.data;
             let data = "";
             if (success) {
