@@ -8,8 +8,18 @@ h4{
 }
 .logo{
     color:#fff;
+    display: flex;
+    align-items: center;
+    
+}
+.logo>h1{
+    color: #fff;
     font-weight:700;
     font-size: 32px;
+    margin-bottom: 0;
+}
+.logo>sub{
+    bottom: -0.8em;
 }
 .header{
     display: flex;

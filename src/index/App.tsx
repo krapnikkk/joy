@@ -3,7 +3,7 @@ import { Route, Link, Redirect } from 'react-router-dom';
 import { Routes } from './router';
 import { Menu } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
-import { GITHUB_URL } from '@src/constants';
+import { EXTENSION_VERSION, GITHUB_URL } from '@src/constants';
 import { Provider } from 'mobx-react'
 import AppStore from './store'
 import './App.css';
@@ -14,7 +14,7 @@ const App: React.FC = () => (
   <Provider AppStore={AppStore}>
     <div className="Container">
       <Header className="header">
-        <section className="logo">JOY</section>
+        <section className="logo"><h1>JOY</h1><sub> v_{EXTENSION_VERSION}</sub></section>
         <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
           <Menu.Item key="1"><Link to="/account">账号管理</Link></Menu.Item>
           <Menu.Item key="2"><Link to="/activity">活动管理</Link></Menu.Item>
