@@ -9,6 +9,7 @@ export const ACTIVITY_TASK_INTERVAL: number = 5;
 export const MINUTE_PER_DAY:number = 1440;
 export const GMT: number = +8;
 export const USER_AGENT:string= "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+export const JDAPP_USER_AGENT:string = "jdapp;android;10.2.0;11;model/MI 9;osVer/30;appBuild/90900;partner/xiaomi001;eufv/1;jdSupportDarkMode/0;Mozilla/5.0 (Linux; Android 11; MI 9 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045715 Mobile Safari/537.36"
 export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key"]; // "3AB9D23F7A4B3C9B"   
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
 export const ACTION_HOST:string = "https://api.m.jd.com/client.action?functionId=";

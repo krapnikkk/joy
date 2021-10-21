@@ -3,6 +3,16 @@ export interface ICollectAtuoScore {
     time: number;
 }
 
+export interface ISimpleRecordInfoVo {
+    itemId: string
+    taskToken: string
+}
+
+export interface IAssistTaskDetailVo {
+    itemId: string,
+    taskToken: string;
+}
+
 export interface IRaskRes {
     activityInfo: {
         activityEndTime: number,
@@ -87,15 +97,23 @@ export interface IAddProductVos { // 加购列表数据
     addProductVos: ITaskVos[];
 }
 
-export interface IBrandMemberVos{ // 入会
+export interface IMyAwardVos { // 奖励
+    pointVo: {
+        awardType: number
+        score: string
+    },
+    taskId: number
+    type: number
+}
+
+export interface IBrandMemberVos { // 入会
 
 }
 
-export interface IProductInfoVos {
+export interface IProductInfoVos extends ISimpleRecordInfoVo{
     backUpWords: string[],
     biclk: string,
     groupId: string,
-    itemId: string,
     jdPrice: string,
     label: string,
     mcInfo: string,
@@ -104,7 +122,6 @@ export interface IProductInfoVos {
     skuImage: string,
     skuName: string,
     status: number,
-    taskToken: string
 }
 
 export interface ITaskDetail {
@@ -140,6 +157,7 @@ export interface ITaskVos {
     advGroupId?: string;
     browseShopVo?: IBrowseTaskVos[], // 浏览任务
     assistTaskDetailVo?: IAssistTaskDetailVo, // 邀请助力
+    simpleRecordInfoVo?:ISimpleRecordInfoVo, // 一般任务
     shoppingActivityVos?: IShoppingActivityVos[],// 浏览会场
     productInfoVos?: IProductInfoVos[], // 浏览商品
     ext: {
@@ -156,47 +174,39 @@ export interface ITaskVos {
     taskId: number,
     taskName: string,
     taskTimesType: number,
-    taskType: number, // 2：常规浏览任务【浏览商品】 3:大型活动 7：浏览参会店铺 9：购物会场 14:邀请好友助力
+    taskType: number, // 2：常规浏览任务【浏览商品】 3:大型活动 7：浏览参会店铺 9：购物会场 12:领取任务 14:邀请好友助力
     times: number,
     waitDuration: number
 }
 
-export interface IBrowseTaskVos {
+export interface IBrowseTaskVos extends ISimpleRecordInfoVo{
     advGroupId: string,
     advertId: string,
     comments: string[],
     ext: { [key: string]: string },
-    itemId: string,
     label: string,
     shopId: string,
     shopImage: string,
     shopName: string,
     status: number,
-    taskToken: string,
     url: string,
     venderId: string
 }
 
-export interface IShoppingActivityVos {
+export interface IShoppingActivityVos extends ISimpleRecordInfoVo{
     advGroupId: string,
     advId: string,
     biclk: string,
     comments: string[],
     [key: string]: string | number | string[]
     icon: string,
-    itemId: string,
     mcInfo: string,
     status: number,
     subtitle: string,
-    taskToken: string,
     title: string,
     url: string
 }
 
-export interface IAssistTaskDetailVo {
-    itemId: string,
-    taskToken: string;
-}
 
 export interface IScoreRuleVos {
     score: string,

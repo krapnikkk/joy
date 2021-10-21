@@ -1,4 +1,4 @@
-import { ACTION_HOST, GENERIC_JR_HOST, globalInfo, USER_AGENT } from "./constants";
+import { ACTION_HOST, GENERIC_JR_HOST, globalInfo, USER_AGENT,JDAPP_USER_AGENT } from "./constants";
 import { get, getReqData, post } from "./utils";
 
 export const toWithdraw = (cookie?: string) => {
@@ -162,7 +162,7 @@ export const getHomeData = async (cookie?: string) => {
     let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
-        "User-Agent": USER_AGENT,
+        "User-Agent": JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
@@ -175,7 +175,7 @@ export const getTaskDetail = async (cookie?: string) => {
     let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
-        "User-Agent": USER_AGENT,
+        "User-Agent": JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
@@ -188,7 +188,7 @@ export const collectScore = async (body: string, cookie?: string) => {
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
-        "User-Agent": USER_AGENT,
+        "User-Agent": JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
@@ -202,7 +202,7 @@ export const collectAtuoScore = async (body: string, cookie?: string) => {
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
-        "User-Agent": USER_AGENT,
+        "User-Agent": JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
@@ -215,7 +215,7 @@ export const getFeedDetail = async (taskId:number,cookie?: string) => {
     let data = `functionId=${functionId}&body=${JSON.stringify({taskId})}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
-        "User-Agent": USER_AGENT,
+        "User-Agent": JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
@@ -228,7 +228,7 @@ export const raise= async (cookie?: string) => {
     let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
-        "User-Agent": USER_AGENT,
+        "User-Agent": JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
@@ -241,7 +241,20 @@ export const sign = async (body: string,cookie?: string) => {
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${functionId}`;
     let header = {
-        "User-Agent": USER_AGENT,
+        "User-Agent": JDAPP_USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const getBadgeAward = async (body: string,cookie?: string) => {
+    let functionId = "travel_getBadgeAward";
+    let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${functionId}`;
+    let header = {
+        "User-Agent": JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
