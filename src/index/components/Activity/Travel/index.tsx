@@ -291,10 +291,18 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             let { cookie } = this.state.accountMap[currentAccount];
             let body = await this.getSourceRes(cookie);
             let res = await collectAtuoScore(body, cookie) as IBaseResData;
-            let result = res.data.result as ICollectAtuoScore;
-            let { produceScore } = result;
-            let data = `已收取金币：${produceScore}`;
-            this.logOutput(data);
+
+            let log = "";
+            let { success } = res.data;
+            if (success) {
+                let result = res.data.result as ICollectAtuoScore;
+                let { produceScore } = result;
+                log = `已收取金币：${produceScore}`;
+            } else {
+                log = res.data.bizMsg;
+            }
+
+            this.logOutput(log);
         }
         this.showMessage("success", "任务已完成！");
     }
@@ -578,7 +586,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             let { nickname } = accountMap[currentAccount];
             log += `【${nickname}】`
         }
-        log += `${text}${this.state.log}\n`;
+        log += `${text}\n${this.state.log}`;
         this.setState({ log })
     }
 
@@ -653,6 +661,53 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         this.setState = (state, callback) => {
             return;
         };
+    }
+
+    async autoTask() {
+        for (let i = 0; i < this.state.accountInfo.length; i++) {
+            let account = this.state.accountInfo[i];
+            let currentAccount = account.curPin;
+            await this.setStateAsync({ currentAccount });
+            let { cookie } = this.state.accountMap[currentAccount];
+            let taskVos = this.state.taskVosMap[currentAccount];
+            for (let k = 0; k < taskVos.length; k++) {
+                let taskVo = taskVos[k];
+                let { taskId, taskType, taskName } = taskVo;
+                if (taskType == 2) {
+                    let log = `开始任务:【${taskName}】`;
+                    this.logOutput(log);
+                    // 获取商品列表
+                    let res = await getFeedDetail(taskId, cookie) as IBaseResData;
+                    let result = res.data.result as IAddProductVos;
+                    let { productInfoVos, maxTimes, times } = result.addProductVos[0]; // 数组默认只有一个值
+                    if (maxTimes <= times) {
+                        log = "当前账号已经完成该任务啦！";
+                        this.logOutput(log);
+                    } else {
+                        for (let j = 0; j < maxTimes; j++) {
+                            let product = productInfoVos[j];
+                            let { taskToken } = product;
+                            let body = await this.getSourceRes(cookie, { taskId, taskToken });
+                            let delay = rnd(1, 3) * 1000;
+                            await sleep(delay);
+                            let res = await collectScore(body, cookie) as IBaseResData;
+                            let { success } = res.data;
+                            if (success) {
+                                let result = res.data.result as ICollectScore;
+                                let { userScore, maxTimes, times, score } = result;
+                                log = `任务进度：${times}/${maxTimes} 获得金币：${score} 当前金币：${userScore}`;
+                            } else {
+                                log = res.msg;
+                            }
+                            this.logOutput(log);
+                        }
+                        log = "当前账号已经完成该任务啦！";
+                        this.logOutput(log);
+                    }
+                }
+            }
+        }
+        this.showMessage("success", "任务已完成！");
     }
 
 }
