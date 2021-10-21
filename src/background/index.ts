@@ -51,7 +51,7 @@ const getCookie = () => {
 }
 
 const checkCookie = (cookie: string) => {
-    return new Promise<void>((resolve)=> {
+    return new Promise<void>((resolve) => {
         getUserInfo(cookie).then((res: Object) => {
             Object.assign(res, { cookie, createDate: Date.now() });
             let curPin: string = res['curPin'];
@@ -154,7 +154,8 @@ const queueTask = (task: Function) => {
 
 // 事件监听
 chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
-    let {data,type} = request;
+    let { data, type } = request;
+    console.log(type);
     switch (type) {
         case AUTO_GET_COOKIES:
             getCookie();
@@ -180,11 +181,13 @@ chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSe
             loginWindow = null;
             if (loginFlag) {
                 restoreCookies();
+            }else{
+                postChromeMessage({ type: CLOSE_LOGIN_WINDOW });
             }
             break;
-            case EXPORT:
-                exportCookie(data);
-                break;
+        case EXPORT:
+            exportCookie(data);
+            break;
         case REQUEST:
             break;
         default:

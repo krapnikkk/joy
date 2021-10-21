@@ -8,13 +8,14 @@ function init() {
 
     // });
     if (location.href.indexOf(MARK) > -1) {
-        console.log("inject");
+        // console.log("inject");
         if (location.href.indexOf(`${LOGIN_PAGE}`) > -1) {
             window.onbeforeunload = () => {
                 postChromeMessage({ // 用户主动关闭窗口
                     type: CLOSE_LOGIN_WINDOW
                 })
             }
+            console.log("???")
         }
         if (location.href.indexOf(`${HOME_PAGE}?${SCENE_VAL}`) > -1) {
             postChromeMessage({
@@ -24,6 +25,12 @@ function init() {
         }
 
     }
+    // window.onbeforeunload = function (){
+    //     /* CODE */
+    //     postChromeMessage({
+    //         type: CLOSE_LOGIN_WINDOW
+    //     })
+    // }
 }
 
 if (document.readyState === 'loading') {
