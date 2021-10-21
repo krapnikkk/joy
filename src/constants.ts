@@ -13,7 +13,7 @@ export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key"]; // "3AB9D23F
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
 export const ACTION_HOST:string = "https://api.m.jd.com/client.action?functionId=";
 
-export const EXTENSION_VERSION: string = "0.0.2";
+export const EXTENSION_VERSION: string = "0.0.3";
 export const CONFIG_DATA_URL:string = "https://krapnik.cn/json/setting.json";
 
 //activity
