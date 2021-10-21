@@ -198,7 +198,6 @@ export default class Account extends React.Component<IProps, IState, {}> {
       for (let key in account) {
         data.push(account[key]);
       }
-      console.log(data);
       this.setState(
         {
           accountInfo: data
