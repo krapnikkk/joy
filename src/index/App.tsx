@@ -22,7 +22,7 @@ const App: React.FC = () => (
           <Menu.Item key="4"><Link to="/setting">全局设置</Link></Menu.Item>
         </Menu>
         <section>
-          {/* <img src="https://profile-counter.glitch.me/joy/count.svg" alt="visitcount" width="100" /> */}
+          {process.env.NODE_ENV !== 'development' ? <img src="https://profile-counter.glitch.me/joy/count.svg" alt="visitcount" style={{ display: "none" }} /> : null}
           <iframe src={GITHUB_URL} frameBorder="0" scrolling="0" width="90px" height="21px"></iframe>
         </section>
       </Header>
