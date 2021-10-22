@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Button, Card, message, PageHeader, Radio, RadioChangeEvent, Switch } from 'antd';
+import { Button, Card, Divider, Dropdown, Menu, message, PageHeader, Radio, RadioChangeEvent, Switch } from 'antd';
+import { UserOutlined, DownOutlined } from "@ant-design/icons";
 import { getRandom, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
 import { IAccount, IBaseResData, ILocalStorageData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
@@ -17,6 +18,8 @@ interface IState {
     log: string;
     scheduleSwitch: boolean;
     scheduleSpan: number;
+    autoTaskSwitch: boolean;
+    autoTaskSpan: number;
 
 }
 interface IProps {
@@ -33,7 +36,9 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             taskDetailMap: {},
             log: "",
             scheduleSwitch: false,
-            scheduleSpan: 1
+            scheduleSpan: 1,
+            autoTaskSwitch: false,
+            autoTaskSpan: 1,
         };
     }
 
@@ -88,6 +93,16 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                 </Button>
                             </section>
                             <section>
+                                定时间隔(分)：
+                                <Radio.Group
+                                    size="small"
+                                    onChange={this.onScheduleSpanChange.bind(this)}
+                                    value={this.state.scheduleSpan}
+                                    disabled={this.state.scheduleSwitch}
+                                >
+                                    <Radio value={1}>30</Radio>
+                                    <Radio value={2}>60</Radio>
+                                </Radio.Group>
                                 定时收取汪汪币：
                                 <Switch
                                     size="small"
@@ -100,13 +115,64 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                 定时间隔(分)：
                                 <Radio.Group
                                     size="small"
-                                    onChange={this.onScheduleSpanChange.bind(this)}
-                                    value={this.state.scheduleSpan}
-                                    disabled={this.state.scheduleSwitch}
+                                    onChange={this.onAutoTaskSpanChange.bind(this)}
+                                    value={this.state.autoTaskSpan}
+                                    disabled={this.state.autoTaskSwitch}
                                 >
-                                    <Radio value={1}>30</Radio>
-                                    <Radio value={2}>60</Radio>
+                                    <Radio value={1}>15</Radio>
+                                    <Radio value={2}>30</Radio>
                                 </Radio.Group>
+                                定时一键完成：
+                                <Switch
+                                    size="small"
+                                    checked={this.state.autoTaskSwitch}
+                                    defaultChecked={this.state.autoTaskSwitch}
+                                    onChange={this.onAutoTaskSwitchChange.bind(this)}
+                                />
+                            </section>
+                            <Divider />
+                            <section>
+                                已选账号：<Dropdown overlay={() => {
+                                    return (<Menu onClick={this.handleMenuClick.bind(this)}>
+                                        {
+                                            this.state.accountInfo.map((account, idx) => (
+                                                <Menu.Item key={idx} icon={<UserOutlined />}>
+                                                    {account.nickname}
+                                                </Menu.Item>
+                                            ))
+                                        }
+                                    </Menu>)
+                                }} trigger={['click']}>
+                                    <Button>
+                                        选择账号 <DownOutlined />
+                                    </Button>
+                                </Dropdown>
+                                <Button type="primary" onClick={() => {
+                                    this.autoTask();
+                                }}>
+                                    获取分享链接
+                                </Button>
+                                <input></input>
+                                已选账号：<Dropdown overlay={() => {
+                                    return (<Menu onClick={this.handleMenuClick.bind(this)}>
+                                        {
+                                            this.state.accountInfo.map((account, idx) => (
+                                                <Menu.Item key={idx} icon={<UserOutlined />}>
+                                                    {account.nickname}
+                                                </Menu.Item>
+                                            ))
+                                        }
+                                    </Menu>)
+                                }} trigger={['click']}>
+                                    <Button>
+                                        选择账号 <DownOutlined />
+                                    </Button>
+                                </Dropdown>
+                                <Button type="primary" onClick={() => {
+                                    this.autoTask();
+                                }}>
+                                    帮ta助力
+                                </Button>
                             </section>
                             <TextArea rows={10} value={this.state.log} />
                         </section>
@@ -180,7 +246,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
 
                 for (let j = 0; j < badgeAwardVos.length; j++) {
                     let badgeAwardVo = badgeAwardVos[j];
-                    let { status ,awardName} = badgeAwardVo;
+                    let { status, awardName } = badgeAwardVo;
                     if (status != 3) {
                         log = `任务【${awardName}】未达标或已经领取啦！`;
                         this.logOutput(log);
@@ -190,7 +256,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                         log = `任务：【${awardName}】领取中`;
                         this.logOutput(log);
                         let res = await getBadgeAward(body, cookie) as IBaseResData;
-                        
+
                         await this.throlle();
                         let { success } = res.data;
                         if (success) {
@@ -362,9 +428,10 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         return JSON.stringify(body);
     }
 
-    timer: number = 0;
+    scheduleTimer: number = 0;
     onScheduleSpanChange(e: RadioChangeEvent) {
         let scheduleSpan = e.target.value;
+
         this.setState({ scheduleSpan });
     }
 
@@ -373,12 +440,35 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         let log = "";
         if (checked) {
             let timeout = this.state.scheduleSpan == 1 ? 30 * 60 * 1000 : 60 * 60 * 1000;
-            this.timer = window.setInterval(() => {
+            this.scheduleTimer = window.setInterval(() => {
                 this.collectAtuoScore();
             }, timeout);
             log = "已开启定时自动收取汪汪币";
         } else {
-            window.clearInterval(this.timer);
+            window.clearInterval(this.scheduleTimer);
+            log = "已关闭定时自动收取汪汪币";
+        }
+        this.logOutput(log, false);
+    }
+
+    autoTaskTimer: number = 0;
+    onAutoTaskSpanChange(e: RadioChangeEvent) {
+        let autoTaskSpan = e.target.value;
+
+        this.setState({ autoTaskSpan });
+    }
+
+    onAutoTaskSwitchChange(checked: boolean) {
+        this.setState({ autoTaskSwitch: checked });
+        let log = "";
+        if (checked) {
+            let timeout = this.state.scheduleSpan == 1 ? 30 * 60 * 1000 : 60 * 60 * 1000;
+            this.autoTaskTimer = window.setInterval(() => {
+                this.collectAtuoScore();
+            }, timeout);
+            log = "已开启定时自动收取汪汪币";
+        } else {
+            window.clearInterval(this.autoTaskTimer);
             log = "已关闭定时自动收取汪汪币";
         }
         this.logOutput(log, false);
@@ -388,6 +478,10 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         this.setState = (state, callback) => {
             return;
         };
+    }
+
+    handleMenuClick(idx: number) {
+        console.log(idx);
     }
 
     async autoTask() {
@@ -531,7 +625,6 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             this.logOutput(log);
         }
     }
-
 
     async browseSimple(taskVo: ITaskVos, cookie: string) {
         let { taskId, taskName, simpleRecordInfoVo } = taskVo;

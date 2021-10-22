@@ -23,12 +23,12 @@ const App: React.FC = () => (
           <Menu.Item key="5"><Link to="/about">关于</Link></Menu.Item>
         </Menu>
         <section>
-          { process.env.NODE_ENV !== 'development' ? <img src="https://profile-counter.glitch.me/joy/count.svg" alt="visitcount" style={{ display: "none" }} /> : null}
+          {process.env.NODE_ENV !== 'development' ? <img src="https://profile-counter.glitch.me/joy/count.svg" alt="visitcount" style={{ display: "none" }} /> : null}
           <iframe src={GITHUB_URL} frameBorder="0" scrolling="0" width="90px" height="21px"></iframe>
         </section>
       </Header>
       <Content className="content">
-        <Redirect to="/account" />
+        <Redirect to={process.env.NODE_ENV !== 'development' ? "/account" : "/activity"} />
         {
           Routes.map((route, index) =>
             <Route key={index} path={route.path} component={route.component} />
