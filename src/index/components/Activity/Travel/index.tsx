@@ -92,6 +92,12 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                     onClick={() => {
                                         this.raise();
                                     }}>
+                                    查看账号信息
+                                </Button>
+                                <Button type="primary"
+                                    onClick={() => {
+                                        this.raise();
+                                    }}>
                                     打卡领红包
                                 </Button>
                                 <Button type="primary"
@@ -154,9 +160,9 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                     onChange={this.onAutoTaskSwitchChange.bind(this)}
                                 />
                             </section>
-                            <Divider />
+                            <Divider>助力相关</Divider>
                             <section>
-                                已选账号：<Dropdown overlay={() => {
+                                <Dropdown overlay={() => {
                                     return (<Menu>
                                         {
                                             this.state.accountInfo.map((account, idx) => (
@@ -176,10 +182,12 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                     onClick={() => {
                                         // this.autoTask();
                                     }}>
-                                    获取分享链接
+                                    获取助力链接
                                 </Button>
-                                <input></input>
-                                已选账号：<Dropdown overlay={() => {
+                            </section>
+                            <section>
+                                助力链接：<input></input>
+                                <Dropdown overlay={() => {
                                     return (
                                         // <Menu onClick={this.handleMenuClick.bind(this)}>
                                         <Menu>
@@ -203,6 +211,73 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                         // this.autoTask();
                                     }}>
                                     帮ta助力
+                                </Button>
+                                <Button type="primary"
+                                    disabled={true}
+                                    onClick={() => {
+                                        // this.autoTask();
+                                    }}>
+                                    帮作者助力
+                                </Button>
+                            </section>
+                            <Divider>组队相关</Divider>
+                            <section>
+                                <Dropdown overlay={() => {
+                                    return (<Menu>
+                                        {
+                                            this.state.accountInfo.map((account, idx) => (
+                                                <Menu.Item key={idx} icon={<UserOutlined />}>
+                                                    {account.nickname}
+                                                </Menu.Item>
+                                            ))
+                                        }
+                                    </Menu>)
+                                }} trigger={['click']}>
+                                    <Button>
+                                        选择账号 <DownOutlined />
+                                    </Button>
+                                </Dropdown>
+                                <Button type="primary"
+                                    disabled={true}
+                                    onClick={() => {
+                                        // this.autoTask();
+                                    }}>
+                                    获取组队链接
+                                </Button>
+                            </section>
+                            <section>
+                                组队链接：<input></input>
+                                <Dropdown overlay={() => {
+                                    return (
+                                        // <Menu onClick={this.handleMenuClick.bind(this)}>
+                                        <Menu>
+                                            {
+                                                this.state.accountInfo.map((account, idx) => (
+                                                    <Menu.Item key={idx} icon={<UserOutlined />}>
+                                                        {account.nickname}
+                                                    </Menu.Item>
+                                                ))
+                                            }
+                                        </Menu>
+                                    )
+                                }} trigger={['click']}>
+                                    <Button>
+                                        选择账号 <DownOutlined />
+                                    </Button>
+                                </Dropdown>
+                                <Button type="primary"
+                                    disabled={true}
+                                    onClick={() => {
+                                        // this.autoTask();
+                                    }}>
+                                    加入队伍
+                                </Button>
+                                <Button type="primary"
+                                    disabled={true}
+                                    onClick={() => {
+                                        // this.autoTask();
+                                    }}>
+                                    加入作者队伍
                                 </Button>
                             </section>
                             <TextArea rows={10} value={this.state.log} />
@@ -259,15 +334,15 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             let log = "";
             if (success) {
                 let result = res.data.result as IRaise;
-                let { raiseInfo, levelUpAward} = result;
-                let {totalScore,usedScore} = raiseInfo;
-                let {score,couponInfo,redpacketInfo,type} = levelUpAward;
+                let { raiseInfo, levelUpAward } = result;
+                let { totalScore, usedScore } = raiseInfo;
+                let { score, couponInfo, redpacketInfo, type } = levelUpAward;
                 log = `打卡成功！获得汪汪币：${score} 当前汪汪币：${+totalScore - (+usedScore)}`;
-                if(type == 4){
-                    let {value} = redpacketInfo;
+                if (type == 4) {
+                    let { value } = redpacketInfo;
                     log += `\n获得红包：${value}`
-                }else if(type == 8){
-                    let {name,usageThreshold,quota} = couponInfo;
+                } else if (type == 8) {
+                    let { name, usageThreshold, quota } = couponInfo;
                     log += `\n获得优惠券：【${name}】${usageThreshold}-${quota}`
                 }
             } else {
@@ -275,7 +350,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             }
             this.logOutput(log);
 
-            
+
             // let { taskVos } = result;
         }
     }
@@ -292,33 +367,36 @@ export default class Travel extends React.Component<IProps, IState, {}> {
 
                 let taskDetail = this.state.taskDetailMap[currentAccount];
                 let { lotteryTaskVos } = taskDetail;
-                let { badgeAwardVos } = lotteryTaskVos[0];//看起来只有一个的样子
                 let log = "";
-
-                for (let j = 0; j < badgeAwardVos.length; j++) {
-                    let badgeAwardVo = badgeAwardVos[j];
-                    let { status, awardName } = badgeAwardVo;
-                    if (status != 3) {
-                        log = `任务【${awardName}】未达标或已经领取啦！`;
-                        this.logOutput(log);
-                    } else {
-                        let { awardToken } = badgeAwardVo;
-                        let body = await this.getSourceRes(cookie, { awardToken });
-                        log = `任务：【${awardName}】领取中`;
-                        this.logOutput(log);
-                        let res = await getBadgeAward(body, cookie, this.state.currentUserAgent) as IBaseResData;
-
-                        await this.throlle();
-                        let { success } = res.data;
-                        if (success) {
-                            let myAwardVo = res.data.result.myAwardVos[0] as IMyAwardVos;
-                            let { score } = myAwardVo.pointVo;
-                            log = `领取成功！获得汪汪币：${score}`;
+                if (lotteryTaskVos) {
+                    let { badgeAwardVos } = lotteryTaskVos[0];//看起来只有一个的样子
+                    for (let j = 0; j < badgeAwardVos.length; j++) {
+                        let badgeAwardVo = badgeAwardVos[j];
+                        let { status, awardName } = badgeAwardVo;
+                        if (status != 3) {
+                            log = `任务【${awardName}】未达标或已经领取啦！`;
+                            this.logOutput(log);
                         } else {
-                            log = res.data.bizMsg;
+                            let { awardToken } = badgeAwardVo;
+                            let body = await this.getSourceRes(cookie, { awardToken });
+                            log = `任务：【${awardName}】领取中`;
+                            this.logOutput(log);
+                            let res = await getBadgeAward(body, cookie, this.state.currentUserAgent) as IBaseResData;
+
+                            await this.throlle();
+                            let { success } = res.data;
+                            if (success) {
+                                let myAwardVo = res.data.result.myAwardVos[0] as IMyAwardVos;
+                                let { score } = myAwardVo.pointVo;
+                                log = `领取成功！获得汪汪币：${score}`;
+                            } else {
+                                log = res.data.bizMsg;
+                            }
+                            this.logOutput(log);
                         }
-                        this.logOutput(log);
                     }
+                } else {
+                    this.logOutput(`暂无奖励`);
                 }
 
             }
@@ -544,14 +622,15 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         this.setState({ autoTaskSwitch: checked });
         let log = "";
         if (checked) {
+            // let 
             let timeout = this.state.scheduleSpan == 1 ? 30 * 60 * 1000 : 60 * 60 * 1000;
             this.autoTaskTimer = window.setInterval(() => {
-                this.collectAtuoScore();
+                this.autoTask(JDAPP_USER_AGENT);
             }, timeout);
-            log = "已开启定时自动收取汪汪币";
+            log = "已开启定时自动完成任务";
         } else {
             window.clearInterval(this.autoTaskTimer);
-            log = "已关闭定时自动收取汪汪币";
+            log = "已关闭定时自动完成任务";
         }
         this.logOutput(log, false);
     }
@@ -563,7 +642,6 @@ export default class Travel extends React.Component<IProps, IState, {}> {
     }
 
     async autoTask(currentUserAgent: string) {
-        console.log(currentUserAgent);
         await this.setStateAsync({
             currentUserAgent
         });
