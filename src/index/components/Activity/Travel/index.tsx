@@ -2,12 +2,13 @@ import * as React from 'react';
 import { Button, Card, Divider, Dropdown, Menu, message, PageHeader, Radio, RadioChangeEvent, Switch } from 'antd';
 import { UserOutlined, DownOutlined } from "@ant-design/icons";
 import { getRandom, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
-import { IAccount, IBaseResData, ILocalStorageData } from '@src/@types';
+import { IAccount, IActivityResData, IBaseResData, ILocalStorageData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
 import TextArea from 'antd/lib/input/TextArea';
-import { collectAtuoScore, collectScore, getBadgeAward, getFeedDetail, getHomeData, getTaskDetail, raise, sign } from '@src/Activity';
+import { collectAtuoScore, collectScore, getBadgeAward, getFeedDetail, getHomeData, getTaskDetail, miMissions, raise, sign } from '@src/Activity';
 import { DateTime } from 'luxon';
-import { IAddProductVos, ICollectAtuoScore, ICollectScore, IMyAwardVos, ISignRes, ITaskDetail, ITaskVos } from './typing';
+import { IAddProductVos, ICollectAtuoScore, ICollectScore, IMiMission, IMyAwardVos, IRaise, ISignRes, ITaskDetail, ITaskVos } from './typing';
+import { JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, MINIPROGRAM_USER_AGENT } from '@src/constants';
 
 interface IState {
     accountInfo: IAccount[];
@@ -15,12 +16,13 @@ interface IState {
     secretpMap: { [key: string]: string };
     currentAccount: string;
     taskDetailMap: { [key: string]: ITaskDetail };
+    miMissionMap: { [key: string]: IMiMission };
     log: string;
     scheduleSwitch: boolean;
     scheduleSpan: number;
-    autoTaskSwitch: boolean;
-    autoTaskSpan: number;
-
+    autoTaskSwitch: boolean,
+    autoTaskSpan: number,
+    currentUserAgent: string;
 }
 interface IProps {
 }
@@ -34,11 +36,13 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             accountMap: {},
             secretpMap: {},
             taskDetailMap: {},
+            miMissionMap: {},
             log: "",
             scheduleSwitch: false,
             scheduleSpan: 1,
             autoTaskSwitch: false,
             autoTaskSpan: 1,
+            currentUserAgent: JDAPP_USER_AGENT
         };
     }
 
@@ -61,19 +65,39 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 <Content>
                     <Card>
                         <h3>使用说明：任务是动态分配的，需要点击多次【一键完成】！</h3>
-                        <h3>首次参与活动需要自行开启活动,不提供入会任务操作</h3>
+                        <h3>首次参与活动需要自行开启活动,不提供入会任务操作！执行任务时请不要执行其他操作！</h3>
                     </Card>
                     <Card>
                         <section className="setting-item">
                             <section>
                                 <Button type="primary" onClick={() => {
-                                    this.autoTask();
+                                    this.autoTask(JDAPP_USER_AGENT);
                                 }}>
-                                    一键完成
+                                    一键完成【商城端】
                                 </Button>
                                 <Button type="primary" onClick={() => {
-                                    this.collectAtuoScore();
+                                    this.autoTask(MINIPROGRAM_USER_AGENT);
                                 }}>
+                                    一键完成【小程序端】
+                                </Button>
+                                <Button type="primary"
+                                    disabled={true} onClick={() => {
+                                        this.autoTask(JDJRAPP_USER_AGENT);
+                                    }}>
+                                    一键完成【金融端】
+                                </Button>
+                            </section>
+                            <section>
+                                <Button type="primary"
+                                    onClick={() => {
+                                        this.raise();
+                                    }}>
+                                    打卡领红包
+                                </Button>
+                                <Button type="primary"
+                                    onClick={() => {
+                                        this.collectAtuoScore();
+                                    }}>
                                     收取汪汪币
                                 </Button>
                                 <Button type="primary" onClick={() => {
@@ -133,7 +157,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             <Divider />
                             <section>
                                 已选账号：<Dropdown overlay={() => {
-                                    return (<Menu onClick={this.handleMenuClick.bind(this)}>
+                                    return (<Menu>
                                         {
                                             this.state.accountInfo.map((account, idx) => (
                                                 <Menu.Item key={idx} icon={<UserOutlined />}>
@@ -147,30 +171,37 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                         选择账号 <DownOutlined />
                                     </Button>
                                 </Dropdown>
-                                <Button type="primary" onClick={() => {
-                                    this.autoTask();
-                                }}>
+                                <Button type="primary"
+                                    disabled={true}
+                                    onClick={() => {
+                                        // this.autoTask();
+                                    }}>
                                     获取分享链接
                                 </Button>
                                 <input></input>
                                 已选账号：<Dropdown overlay={() => {
-                                    return (<Menu onClick={this.handleMenuClick.bind(this)}>
-                                        {
-                                            this.state.accountInfo.map((account, idx) => (
-                                                <Menu.Item key={idx} icon={<UserOutlined />}>
-                                                    {account.nickname}
-                                                </Menu.Item>
-                                            ))
-                                        }
-                                    </Menu>)
+                                    return (
+                                        // <Menu onClick={this.handleMenuClick.bind(this)}>
+                                        <Menu>
+                                            {
+                                                this.state.accountInfo.map((account, idx) => (
+                                                    <Menu.Item key={idx} icon={<UserOutlined />}>
+                                                        {account.nickname}
+                                                    </Menu.Item>
+                                                ))
+                                            }
+                                        </Menu>
+                                    )
                                 }} trigger={['click']}>
                                     <Button>
                                         选择账号 <DownOutlined />
                                     </Button>
                                 </Dropdown>
-                                <Button type="primary" onClick={() => {
-                                    this.autoTask();
-                                }}>
+                                <Button type="primary"
+                                    disabled={true}
+                                    onClick={() => {
+                                        // this.autoTask();
+                                    }}>
                                     帮ta助力
                                 </Button>
                             </section>
@@ -185,7 +216,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
 
     async getHomeData(cookie?: string) {
         let { currentAccount, secretpMap } = this.state;
-        let res = await getHomeData(cookie) as IBaseResData;
+        let res = await getHomeData(cookie, this.state.currentUserAgent) as IBaseResData;
         let result = res.data.result;
         let { homeMainInfo } = result;
         let { secretp } = homeMainInfo;
@@ -200,14 +231,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
             let body = await this.getSourceRes(cookie);
-            let res = await sign(body, cookie) as IBaseResData;
+            let res = await sign(body, cookie, this.state.currentUserAgent) as IBaseResData;
             let { success } = res.data;
             let log = "";
             if (success) {
                 let result = res.data.result as ISignRes;
                 let { scoreResult } = result;
                 let { score, totalScore } = scoreResult;
-                log = `签到成功！获得汪汪币：${score} 当前汪汪币：${totalScore}`;
+                log = `签到成功！获得汪汪币：${score} 总获得汪汪币：${totalScore}`;
             } else {
                 log = res.data.bizMsg;
             }
@@ -222,9 +253,29 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             let currentAccount = account.curPin;
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
-            await raise(cookie);
-            // let res = await raise(cookie) as IBaseResData;
-            // let result = res.data.result as ITaskDetail;
+            let body = await this.getSourceRes(cookie);
+            let res = await raise(body, cookie) as IBaseResData;
+            let { success } = res.data;
+            let log = "";
+            if (success) {
+                let result = res.data.result as IRaise;
+                let { raiseInfo, levelUpAward} = result;
+                let {totalScore,usedScore} = raiseInfo;
+                let {score,couponInfo,redpacketInfo,type} = levelUpAward;
+                log = `打卡成功！获得汪汪币：${score} 当前汪汪币：${+totalScore - (+usedScore)}`;
+                if(type == 4){
+                    let {value} = redpacketInfo;
+                    log += `\n获得红包：${value}`
+                }else if(type == 8){
+                    let {name,usageThreshold,quota} = couponInfo;
+                    log += `\n获得优惠券：【${name}】${usageThreshold}-${quota}`
+                }
+            } else {
+                log = res.data.bizMsg;
+            }
+            this.logOutput(log);
+
+            
             // let { taskVos } = result;
         }
     }
@@ -255,7 +306,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                         let body = await this.getSourceRes(cookie, { awardToken });
                         log = `任务：【${awardName}】领取中`;
                         this.logOutput(log);
-                        let res = await getBadgeAward(body, cookie) as IBaseResData;
+                        let res = await getBadgeAward(body, cookie, this.state.currentUserAgent) as IBaseResData;
 
                         await this.throlle();
                         let { success } = res.data;
@@ -289,13 +340,28 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             let account = this.state.accountInfo[i];
             let currentAccount = account.curPin;
             let { cookie } = account;
-            let res = await getTaskDetail(cookie) as IBaseResData;
+            let res = await getTaskDetail(cookie, this.state.currentUserAgent) as IBaseResData;
             let taskDetail = res.data.result as ITaskDetail;
             let taskDetailMap = this.state.taskDetailMap;
             taskDetailMap[currentAccount] = taskDetail;
             await this.setStateAsync({ taskDetailMap, currentAccount });
             let { taskVos } = taskDetail;
             let data = this.initTaskVos(taskVos);
+            this.logOutput(data);
+        }
+    }
+
+    async miMissions() {
+        for (let i = 0; i < this.state.accountInfo.length; i++) {
+            let account = this.state.accountInfo[i];
+            let currentAccount = account.curPin;
+            let { cookie } = account;
+            let res = await miMissions(cookie) as IActivityResData;
+            let miMission = res.resultData.data as IMiMission;
+            let miMissionMap = this.state.miMissionMap;
+            miMissionMap[currentAccount] = miMission;
+            await this.setStateAsync({ miMissionMap, currentAccount });
+            let data = this.initMiMissions(miMission);
             this.logOutput(data);
         }
     }
@@ -310,6 +376,22 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         return data;
     }
 
+    initMiMissions(miMission: IMiMission) {
+        // let {views,trades} = miMission;
+        let data = "当前任务情况：\n";
+        // for (let i = 0; i < views.length; i++) {
+        //     let view = views[i]
+        //     let { complete, title } = view;
+        //     data += `【${title}】 任务进度：${complete?"未开始":"已完成"}\n`;
+        // }
+        // for (let i = 0; i < trades.length; i++) {
+        //     let trade = trades[i]
+        //     let { complete, title } = trade;
+        //     data += `【${title}】 任务进度：${complete?"未开始":"已完成"}\n`;
+        // }
+        return data;
+    }
+
     async collectAtuoScore() {
         for (let i = 0; i < this.state.accountInfo.length; i++) {
             let account = this.state.accountInfo[i];
@@ -317,7 +399,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
             let body = await this.getSourceRes(cookie);
-            let res = await collectAtuoScore(body, cookie) as IBaseResData;
+            let res = await collectAtuoScore(body, cookie, this.state.currentUserAgent) as IBaseResData;
 
             let log = "";
             let { success } = res.data;
@@ -348,18 +430,18 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 let { taskToken, title } = shop;
                 let body = await this.getSourceRes(cookie, { taskId, taskToken, actionType: 1 });
                 log = `任务：【${title}】浏览中。。。`;
-                let res = await collectScore(body, cookie) as IBaseResData;
+                let res = await collectScore(body, cookie, this.state.currentUserAgent) as IBaseResData;
                 this.logOutput(log);
                 await this.throlle();
                 if (waitDuration != 0) {
                     body = await this.getSourceRes(cookie, { taskId, taskToken });
-                    res = await collectScore(body, cookie) as IBaseResData;
+                    res = await collectScore(body, cookie, this.state.currentUserAgent) as IBaseResData;
                 }
                 let { success } = res.data;
                 if (success) {
                     let result = res.data.result as ICollectScore;
                     let { userScore, score } = result;
-                    log = `任务进度：${j + 1}/${maxTimes} 获得汪汪币：${score} 当前汪汪币：${userScore}`;
+                    log = `任务进度：${j + 1}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
                 } else {
                     log = res.data.bizMsg;
                 }
@@ -480,15 +562,21 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         };
     }
 
-    handleMenuClick(idx: number) {
-        console.log(idx);
-    }
-
-    async autoTask() {
-        await this.getTaskDetail();
+    async autoTask(currentUserAgent: string) {
+        console.log(currentUserAgent);
+        await this.setStateAsync({
+            currentUserAgent
+        });
         this.logOutput("开始一键完成任务！", false);
-        await this.taskHandler();
-        await this.getBadgeAward();
+        if (currentUserAgent == JDJRAPP_USER_AGENT) {
+            await this.miMissions();
+        } else {
+            await this.getTaskDetail();
+            await this.taskHandler();
+        }
+        if (currentUserAgent == JDAPP_USER_AGENT) { // todo 
+            await this.getBadgeAward();
+        }
         this.logOutput(`结束一键完成任务！`, false);
         this.showMessage("success", "任务已完成！");
     }
@@ -561,15 +649,15 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 await this.throlle();
                 log = `任务：【${taskName}】浏览中。。。`;
                 this.logOutput(log);
-                await collectScore(body, cookie) as IBaseResData;
+                await collectScore(body, cookie, this.state.currentUserAgent) as IBaseResData;
                 await this.throlle(waitDuration);
                 body = await this.getSourceRes(cookie, { taskId, taskToken });
-                let res = await collectScore(body, cookie) as IBaseResData;
+                let res = await collectScore(body, cookie, this.state.currentUserAgent) as IBaseResData;
                 let { success } = res.data;
                 if (success) {
                     let result = res.data.result as ICollectScore;
                     let { userScore, score } = result;
-                    log = `任务进度：${j + 1}/${maxTimes} 获得汪汪币：${score} 当前汪汪币：${userScore}`;
+                    log = `任务进度：${j + 1}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
                 } else {
                     log = res.data.bizMsg;
                 }
@@ -585,7 +673,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         let log = `开始任务:【${taskName}】`;
         this.logOutput(log);
         // 获取商品列表
-        let res = await getFeedDetail(taskId, cookie) as IBaseResData;
+        let res = await getFeedDetail(taskId, cookie, this.state.currentUserAgent) as IBaseResData;
         let result = res.data.result as IAddProductVos;
         let taskVos;
         if (type == 5) {
@@ -610,12 +698,12 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 let body = await this.getSourceRes(cookie, { taskId, taskToken });
                 await this.throlle();
 
-                let res = await collectScore(body, cookie) as IBaseResData;
+                let res = await collectScore(body, cookie, this.state.currentUserAgent) as IBaseResData;
                 let { success } = res.data;
                 if (success) {
                     let result = res.data.result as ICollectScore;
                     let { userScore, maxTimes, times, score } = result;
-                    log = `任务进度：${times}/${maxTimes} 获得汪汪币：${score} 当前汪汪币：${userScore}`;
+                    log = `任务进度：${times}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
                 } else {
                     log = res.data.bizMsg;
                 }
@@ -634,12 +722,12 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         let body = await this.getSourceRes(cookie, { taskId, taskToken });
         await this.throlle();
 
-        let res = await collectScore(body, cookie) as IBaseResData;
+        let res = await collectScore(body, cookie, this.state.currentUserAgent) as IBaseResData;
         let { success } = res.data;
         if (success) {
             let result = res.data.result as ICollectScore;
             let { userScore, maxTimes, times, score } = result;
-            log = `任务进度：${times}/${maxTimes} 获得汪汪币：${score} 当前汪汪币：${userScore}`;
+            log = `任务进度：${times}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
         } else {
             log = res.data.bizMsg;
         }

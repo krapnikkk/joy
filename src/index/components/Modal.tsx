@@ -50,9 +50,7 @@ export default class ModalComponent extends React.Component<IProps, IState, {}> 
                 okButtonProps={{ disabled: this.state.force }}
                 cancelButtonProps={{ disabled: this.state.force }}
             >
-                {
-                    <section dangerouslySetInnerHTML={{__html:this.state.content}}></section>
-                }
+                <section dangerouslySetInnerHTML={{ __html: this.state.content }}></section>
             </Modal>
         )
     }

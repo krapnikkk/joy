@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from react;
 
 export interface IProperty extends PropertyDescriptor {
     enumerable: boolean | undefined;
@@ -11,9 +11,9 @@ export interface IEvent {
     data?: {}
 }
 
-export interface ILocalStorageData{
-    account:{
-        [key:string]:IAccount
+export interface ILocalStorageData {
+    account: {
+        [key: string]: IAccount
     }
 }
 
@@ -72,6 +72,50 @@ export interface IActionData {
     success: boolean;
 }
 
+export interface IMiMission {
+    trades: ITrade[],
+    level: ILevel,
+    views: IView[]
+}
+
+export interface ITrade {
+    missionId: number,
+    subTitle: string,
+    frequencyType: number,
+    icon: string,
+    channel: string,
+    position: number,
+    title: string,
+    url: string,
+    status: number,
+    coin: number
+}
+
+export interface ILevel {
+    total: number,
+    complete: number,
+    levelStatus: levelStatus[]
+}
+
+export interface IView {
+    missionId: number,
+    icon: string,
+    channel: string,
+    title: string,
+    url: string,
+    total: number,
+    subTitle: string,
+    complete: number,
+    status: number
+}
+
+export interface ILevelStatus {
+    missions: number,
+    status: number
+}
+
+// 
+
 export interface IConfig {
     affix: IAffix[];
     version: string;
@@ -92,6 +136,7 @@ export interface IAffix {
     image?: string;
     width?: number
 }
+
 
 declare global {
     export interface IProps {

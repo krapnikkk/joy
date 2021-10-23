@@ -1,4 +1,4 @@
-import { ACTION_HOST, GENERIC_JR_HOST, globalInfo, USER_AGENT,JDAPP_USER_AGENT } from "./constants";
+import { ACTION_HOST, GENERIC_JR_HOST, globalInfo, USER_AGENT, JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, MINIPROGRAM_USER_AGENT } from "./constants";
 import { get, getReqData, post } from "./utils";
 
 export const toWithdraw = (cookie?: string) => {
@@ -157,25 +157,33 @@ export const autoHarvest = async (cookie: string, key: string) => {
 }
 
 // 热爱环游记
-export const getHomeData = async (cookie?: string) => {
+export const getHomeData = async (cookie?: string, userAgent?: string) => {
     let functionId = "travel_getHomeData";
-    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
+    let body = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ?{"appSign":"2"}:{};
+    let data = `functionId=${functionId}&body=${JSON.stringify(body)}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
+        ...args,
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
     return post(url, data, header);
 }
 
-export const getTaskDetail = async (cookie?: string) => {
+export const getTaskDetail = async (cookie?: string, userAgent?: string) => {
     let functionId = "travel_getTaskDetail";
-    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
+    let body = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ?{"appSign":"2"}:{};
+    let data = `functionId=${functionId}&body=${JSON.stringify(body)}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        ...args,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
@@ -183,13 +191,16 @@ export const getTaskDetail = async (cookie?: string) => {
     return post(url, data, header);
 }
 
-export const collectScore = async (body: string, cookie?: string) => {
+export const collectScore = async (body: string, cookie?: string, userAgent?: string) => {
     let functionId = "travel_collectScore";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
+        ...args,
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
@@ -197,65 +208,94 @@ export const collectScore = async (body: string, cookie?: string) => {
 }
 
 
-export const collectAtuoScore = async (body: string, cookie?: string) => {
+export const collectAtuoScore = async (body: string, cookie?: string, userAgent?: string) => {
     let functionId = "travel_collectAtuoScore";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
+        ...args,
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
     return post(url, data, header);
 }
 
-export const getFeedDetail = async (taskId:number,cookie?: string) => {
+export const getFeedDetail = async (taskId: number, cookie?: string, userAgent?: string) => {
     let functionId = "travel_getFeedDetail";
-    let data = `functionId=${functionId}&body=${JSON.stringify({taskId})}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
+    let data = `functionId=${functionId}&body=${JSON.stringify({ taskId })}&client=wh5&clientVersion=1.0.0`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
+        ...args,
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
     return post(url, data, header);
 }
 
-export const raise= async (cookie?: string) => {
+export const raise = async (cookie?: string, userAgent?: string) => {
     let functionId = "travel_raise";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
+        ...args,
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
     return post(url, data, header);
 }
 
-export const sign = async (body: string,cookie?: string) => {
+export const sign = async (body: string, cookie?: string, userAgent?: string) => {
     let functionId = "travel_sign";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
+        ...args,
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
     return post(url, data, header);
 }
 
-export const getBadgeAward = async (body: string,cookie?: string) => {
+export const getBadgeAward = async (body: string, cookie?: string, userAgent?: string) => {
     let functionId = "travel_getBadgeAward";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
-    let url = `${ACTION_HOST}${functionId}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": JDAPP_USER_AGENT,
+        "User-Agent": userAgent || JDAPP_USER_AGENT,
         "Referer": "https://wbbny.m.jd.com/",
+        ...args,
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const miMissions = async (cookie?: string) => {
+    let reqData = "miMissions";
+    let data = `reqData=${JSON.stringify(reqData)}`;
+    let url = `${GENERIC_JR_HOST}miMissions`;
+    let header = {
+        "User-Agent": JDJRAPP_USER_AGENT,
+        "Referer": "https://wbbny.m.jd.com/",
+        "X-Requested-With": "com.jd.jrapp",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
