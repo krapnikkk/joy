@@ -1,21 +1,16 @@
-import { HOME_PAGE, LOGIN_PAGE, MARK, SCENE_VAL } from "@src/constants";
+import { DEFAULT_ACTIVITY_HOST, HOME_PAGE, LOGIN_PAGE, MARK, SCENE_VAL } from "@src/constants";
 import { CLOSE_LOGIN_WINDOW, LOGIN_SUCCESS } from "@src/Events"
-import { postChromeMessage } from "@src/utils"
+import { injectCustomJs, postChromeMessage } from "@src/utils"
 
 // import { injectCustomJs } from '../utils';
 function init() {
-    // injectCustomJs("js/inject.bundle.js").then(()=>{
-
-    // });
     if (location.href.indexOf(MARK) > -1) {
-        // console.log("inject");
         if (location.href.indexOf(`${LOGIN_PAGE}`) > -1) {
             window.onbeforeunload = () => {
                 postChromeMessage({ // 用户主动关闭窗口
                     type: CLOSE_LOGIN_WINDOW
                 })
             }
-            console.log("???")
         }
         if (location.href.indexOf(`${HOME_PAGE}?${SCENE_VAL}`) > -1) {
             postChromeMessage({
@@ -34,11 +29,17 @@ function init() {
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init)
+    onLoading();
+    document.addEventListener('DOMContentLoaded', init);
 } else {
     init()
 }
 
+function onLoading() {
+    if (location.href.indexOf(DEFAULT_ACTIVITY_HOST) > -1) {
+        injectCustomJs("js/inject.bundle.js").then(()=>{});
+    }
+}
 
 
 // injects a copy of stylesheets so that other extensions(e.g. dark reader) could read

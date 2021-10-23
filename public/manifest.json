@@ -38,13 +38,14 @@
     {
       "matches": [
         "https://home.m.jd.com/myJd/*",
-        "https://plogin.m.jd.com/login/*"
+        "https://plogin.m.jd.com/login/*",
+        "https://wbbny.m.jd.com/*"
       ],
       "js": [
         "js/content.bundle.js"
       ],
       "all_frames": true,
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ]
 }

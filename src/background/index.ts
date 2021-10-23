@@ -216,10 +216,10 @@ const startScheduleTask = () => {
 
 const startActivityTask = async () => {
     if (!dailySignInFlag) {
-        await queueTask(autoToWithdraw);
+        // await queueTask(autoToWithdraw);
         dailySignInFlag = true;
     } else {
-        await queueTask(toWithdraw);
+        // await queueTask(toWithdraw);
     }
     // await queueTask(pigPetOpenBox);
     // await queueTask(autoHarvest);
@@ -232,6 +232,7 @@ startScheduleTask();
 
 // for test
 chrome['autoToWithdraw'] = autoToWithdraw;
+chrome['toWithdraw'] = toWithdraw;
 chrome['toGoldExchange'] = toGoldExchange;
 chrome['toDailySignIn'] = toDailySignIn;
 chrome['toDailyHome'] = toDailyHome;

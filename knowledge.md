@@ -7,6 +7,9 @@
 ## cookie隔离
 
 ## 302重定向 & 获取 set-cookie
+
+chrome.webRequest.onBeforeRedirect
+
 chrome.webRequest.onHeadersReceived.addListener(
     (details: chrome.webRequest.WebRequestHeadersDetails) => {
         

@@ -76,15 +76,15 @@ export const injectCustomJs = (jsPath: string) => {
         script.setAttribute('charset', 'utf-8');
         script.src = chrome.extension.getURL(jsPath);
         script.onload = () => {
-            document.head.removeChild(script);
+            document.querySelector("html").removeChild(script);
             resolve();
         }
         script.onerror = (e) => {
-            document.head.removeChild(script);
+            document.querySelector("html").removeChild(script);
             console.warn(e);
             reject(e);
         }
-        document.head.appendChild(script);
+        document.querySelector("html").appendChild(script);
     })
 
 }
@@ -223,7 +223,8 @@ export const post = async (url: string, data: {}, header?: { [key: string]: stri
 
 export const updateHeader = (header: { [key: string]: string }, filter?: string) => {
     let setHeader = (details: chrome.webRequest.WebRequestHeadersDetails) => {
-        details.requestHeaders.forEach((requestHeader) => {
+        for (let i = 0; i < details.requestHeaders.length; i++) {
+            let requestHeader = details.requestHeaders[i];
             for (let [name, value] of Object.entries(header)) {
                 if (value && requestHeader.name.toLowerCase() === name.toLowerCase()) {
                     requestHeader.value = value;
@@ -231,12 +232,13 @@ export const updateHeader = (header: { [key: string]: string }, filter?: string)
                     break;
                 }
             }
-        });
+        }
         for (let [name, value] of Object.entries(header)) {
             if (value) {
                 details.requestHeaders.push({ name, value });
             }
         }
+        console.log(details);
         return { requestHeaders: details.requestHeaders };
     }
 
@@ -323,5 +325,35 @@ export const getRandom = (): string => {
 }
 
 export const rnd = (min: number, max: number) => {
-	return Math.floor(Math.random() * (max - min + 1) + min);
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+export const setUserAgent = (userAgent: string) => {
+    // Works on Firefox, Chrome, Opera and IE9+
+    // if (navigator["__defineGetter__"]) {
+    //     navigator["__defineGetter__"]('userAgent', function () {
+    //         return userAgent;
+    //     });
+    // } else if (Object.defineProperty) {
+    Object.defineProperty(navigator, 'userAgent', {
+        get: function () {
+            return userAgent;
+        }
+    });
+    // }
+    // // Works on Safari
+    // if (window.navigator.userAgent !== userAgent) {
+    //     var userAgentProp = {
+    //         get: function () {
+    //             return userAgent;
+    //         }
+    //     };
+    //     try {
+    //         Object.defineProperty(window.navigator, 'userAgent', userAgentProp);
+    //     } catch (e) {
+    //         window.navigator = Object.create(navigator, {
+    //             userAgent: userAgentProp
+    //         });
+    //     }
+    // }
 }
