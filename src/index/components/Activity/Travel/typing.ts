@@ -110,7 +110,7 @@ export interface IBrandMemberVos { // 入会
 
 }
 
-export interface IProductInfoVos extends ISimpleRecordInfoVo{
+export interface IProductInfoVos extends ISimpleRecordInfoVo {
     backUpWords: string[],
     biclk: string,
     groupId: string,
@@ -157,7 +157,7 @@ export interface ITaskVos {
     advGroupId?: string;
     browseShopVo?: IBrowseTaskVos[], // 浏览任务
     assistTaskDetailVo?: IAssistTaskDetailVo, // 邀请助力
-    simpleRecordInfoVo?:ISimpleRecordInfoVo, // 一般任务
+    simpleRecordInfoVo?: ISimpleRecordInfoVo, // 一般任务
     shoppingActivityVos?: IShoppingActivityVos[],// 浏览会场
     productInfoVos?: IProductInfoVos[], // 浏览商品
     ext: {
@@ -179,7 +179,7 @@ export interface ITaskVos {
     waitDuration: number
 }
 
-export interface IBrowseTaskVos extends ISimpleRecordInfoVo{
+export interface IBrowseTaskVos extends ISimpleRecordInfoVo {
     advGroupId: string,
     advertId: string,
     comments: string[],
@@ -193,7 +193,7 @@ export interface IBrowseTaskVos extends ISimpleRecordInfoVo{
     venderId: string
 }
 
-export interface IShoppingActivityVos extends ISimpleRecordInfoVo{
+export interface IShoppingActivityVos extends ISimpleRecordInfoVo {
     advGroupId: string,
     advId: string,
     biclk: string,
@@ -211,4 +211,112 @@ export interface IShoppingActivityVos extends ISimpleRecordInfoVo{
 export interface IScoreRuleVos {
     score: string,
     scoreRuleType: number
+}
+
+
+export interface IMiMission {
+    trades: ITrade[],
+    level: ILevel,
+    views: IView[]
+}
+
+export interface ITrade {
+    missionId: number,
+    subTitle: string,
+    frequencyType: number,
+    icon: string,
+    channel: string,
+    position: number,
+    title: string,
+    url: string,
+    status: number,
+    coin: number
+}
+
+export interface ILevel {
+    total: number,
+    complete: number,
+    levelStatus: ILevelStatus[]
+}
+
+export interface IView {
+    missionId: number,
+    icon: string,
+    channel: string,
+    title: string,
+    url: string,
+    total: number,
+    subTitle: string,
+    complete: number,
+    status: number
+}
+
+export interface ILevelStatus {
+    missions: number,
+    status: number
+}
+
+export interface IRaise {
+    activityInfo: IActivityInfo;
+    levelUp: number;
+    levelUpAward: ILevelAward;
+    raiseInfo: IRaiseInfo
+}
+
+export interface IActivityInfo {
+    activityEndTime: number
+    activityStartTime: number
+    awardStartTime: number
+    nowTime: number
+    waitLotteryStartTime: number
+}
+
+export interface ILevelAward {
+    awardCoins: number
+    canFirstShare: boolean
+    firstShareAwardCoins: number
+    redNum: number
+    score: string
+    type: number
+    couponInfo?: ICouponInfo
+    redpacketInfo?: IRedpacketInfo
+}
+
+export interface ICouponInfo {
+    batchId: string
+    desc: string
+    name: string
+    quota: string
+    usageThreshold: string
+}
+
+export interface IRedpacketInfo {
+    desc: string
+    name: string
+    value: string
+}
+
+export interface IRaiseInfo {
+    cityConfig: ICityConfig
+    curLevelStartScore: string
+    finishTime: number
+    flag: number
+    fullFlag: false
+    nextLevelScore: string
+    remainScore: string
+    scoreLevel: number
+    totalScore: string
+    usedScore: string
+}
+
+export interface ICityConfig {
+    backgroundImage: string
+    cityId: number
+    cityName: string
+    cityPostCard: string
+    cityType: number
+    clockNeedsCoins: number
+    points: IPoint[]
+    wholeMapFinishPic: string
+
 }

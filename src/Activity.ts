@@ -157,7 +157,7 @@ export const autoHarvest = async (cookie: string, key: string) => {
 }
 
 // 热爱环游记
-export const getHomeData = async (cookie?: string, userAgent?: string) => {
+export const getHomeData = async (cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_getHomeData";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let body = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ?{"appSign":"2"}:{};
@@ -165,7 +165,7 @@ export const getHomeData = async (cookie?: string, userAgent?: string) => {
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         "Referer": "https://wbbny.m.jd.com/",
         ...args,
         cookie,
@@ -174,7 +174,7 @@ export const getHomeData = async (cookie?: string, userAgent?: string) => {
     return post(url, data, header);
 }
 
-export const getTaskDetail = async (cookie?: string, userAgent?: string) => {
+export const getTaskDetail = async (cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_getTaskDetail";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let body = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ?{"appSign":"2"}:{};
@@ -182,7 +182,7 @@ export const getTaskDetail = async (cookie?: string, userAgent?: string) => {
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         ...args,
         "Referer": "https://wbbny.m.jd.com/",
         cookie,
@@ -191,14 +191,14 @@ export const getTaskDetail = async (cookie?: string, userAgent?: string) => {
     return post(url, data, header);
 }
 
-export const collectScore = async (body: string, cookie?: string, userAgent?: string) => {
+export const collectScore = async (body: string, cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_collectScore";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${api}=${functionId}`
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         "Referer": "https://wbbny.m.jd.com/",
         ...args,
         cookie,
@@ -208,14 +208,14 @@ export const collectScore = async (body: string, cookie?: string, userAgent?: st
 }
 
 
-export const collectAtuoScore = async (body: string, cookie?: string, userAgent?: string) => {
+export const collectAtuoScore = async (body: string, cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_collectAtuoScore";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         "Referer": "https://wbbny.m.jd.com/",
         ...args,
         cookie,
@@ -224,14 +224,14 @@ export const collectAtuoScore = async (body: string, cookie?: string, userAgent?
     return post(url, data, header);
 }
 
-export const getFeedDetail = async (taskId: number, cookie?: string, userAgent?: string) => {
+export const getFeedDetail = async (taskId: number, cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_getFeedDetail";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${JSON.stringify({ taskId })}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         "Referer": "https://wbbny.m.jd.com/",
         ...args,
         cookie,
@@ -240,14 +240,14 @@ export const getFeedDetail = async (taskId: number, cookie?: string, userAgent?:
     return post(url, data, header);
 }
 
-export const raise = async (cookie?: string, userAgent?: string) => {
+export const raise = async (body:string,cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_raise";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
-    let data = `functionId=${functionId}&body={}&client=wh5&clientVersion=1.0.0`;
+    let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         "Referer": "https://wbbny.m.jd.com/",
         ...args,
         cookie,
@@ -256,14 +256,14 @@ export const raise = async (cookie?: string, userAgent?: string) => {
     return post(url, data, header);
 }
 
-export const sign = async (body: string, cookie?: string, userAgent?: string) => {
+export const sign = async (body: string, cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_sign";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         "Referer": "https://wbbny.m.jd.com/",
         ...args,
         cookie,
@@ -272,14 +272,14 @@ export const sign = async (body: string, cookie?: string, userAgent?: string) =>
     return post(url, data, header);
 }
 
-export const getBadgeAward = async (body: string, cookie?: string, userAgent?: string) => {
+export const getBadgeAward = async (body: string, cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "travel_getBadgeAward";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let data = `functionId=${functionId}&body=${body}&client=wh5&clientVersion=1.0.0`;
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
-        "User-Agent": userAgent || JDAPP_USER_AGENT,
+        "User-Agent": userAgent,
         "Referer": "https://wbbny.m.jd.com/",
         ...args,
         cookie,
