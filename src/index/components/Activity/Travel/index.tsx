@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { Button, Card, Divider, Dropdown, Menu, message, PageHeader, Radio, RadioChangeEvent, Switch } from 'antd';
+import { Button, Card, Divider, Dropdown, Menu, message, PageHeader, Radio, RadioChangeEvent, Switch, } from 'antd';
 import { UserOutlined, DownOutlined } from "@ant-design/icons";
-import { getRandom, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
+import { copyText, getRandom, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
 import { IAccount, IActivityResData, IBaseResData, ILocalStorageData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
 import TextArea from 'antd/lib/input/TextArea';
 import { collectAtuoScore, collectScore, getBadgeAward, getFeedDetail, getHomeData, getTaskDetail, miMissions, raise, sign } from '@src/Activity';
 import { DateTime } from 'luxon';
 import { IAddProductVos, ICollectAtuoScore, ICollectScore, IMiMission, IMyAwardVos, IRaise, ISignRes, ITaskDetail, ITaskVos } from './typing';
-import { JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, MINIPROGRAM_USER_AGENT } from '@src/constants';
+import { DEFAULT_ACTIVITY_HOST, JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, MINIPROGRAM_USER_AGENT, TRAVEL_INVITE, TRAVEL_URL } from '@src/constants';
+import { MenuInfo } from 'rc-menu/lib/interface';
 
 interface IState {
     accountInfo: IAccount[];
@@ -23,6 +24,11 @@ interface IState {
     autoTaskSwitch: boolean,
     autoTaskSpan: number,
     currentUserAgent: string;
+    currentGetInvitedIdx: number;
+    currentGetInvitedAccount: string;
+    currentDoInvitedIdx: number;
+    currentDoInvitedAccount: string;
+    inviteURL: string;
 }
 interface IProps {
 }
@@ -42,12 +48,18 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             scheduleSpan: 1,
             autoTaskSwitch: false,
             autoTaskSpan: 1,
-            currentUserAgent: JDAPP_USER_AGENT
+            currentUserAgent: JDAPP_USER_AGENT,
+            currentGetInvitedIdx: -1,
+            currentGetInvitedAccount: "选择账号",
+            currentDoInvitedIdx: -1,
+            currentDoInvitedAccount: "选择账号",
+            inviteURL: ""
         };
     }
 
-    public componentDidMount() {
-        this.getAccountInfo();
+    public async componentDidMount() {
+        await this.getAccountInfo();
+        await this.getTaskDetail(false);
     }
 
     render() {
@@ -130,8 +142,8 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                     value={this.state.scheduleSpan}
                                     disabled={this.state.scheduleSwitch}
                                 >
-                                    <Radio value={1}>30</Radio>
-                                    <Radio value={2}>60</Radio>
+                                    <Radio value={1}>240</Radio>
+                                    <Radio value={2}>300</Radio>
                                 </Radio.Group>
                                 定时收取汪汪币：
                                 <Switch
@@ -149,8 +161,8 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                     value={this.state.autoTaskSpan}
                                     disabled={this.state.autoTaskSwitch}
                                 >
-                                    <Radio value={1}>15</Radio>
-                                    <Radio value={2}>30</Radio>
+                                    <Radio value={1}>120</Radio>
+                                    <Radio value={2}>300</Radio>
                                 </Radio.Group>
                                 定时一键完成：
                                 <Switch
@@ -163,38 +175,49 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             <Divider>助力相关</Divider>
                             <section>
                                 <Dropdown overlay={() => {
-                                    return (<Menu>
+                                    return (<Menu onClick={this.handleInvitedClick.bind(this)}>
                                         {
                                             this.state.accountInfo.map((account, idx) => (
                                                 <Menu.Item key={idx} icon={<UserOutlined />}>
-                                                    {account.nickname}
+                                                    {account.curPin}
                                                 </Menu.Item>
                                             ))
                                         }
                                     </Menu>)
                                 }} trigger={['click']}>
                                     <Button>
-                                        选择账号 <DownOutlined />
+                                        {this.state.currentGetInvitedAccount}
+                                        <DownOutlined />
                                     </Button>
                                 </Dropdown>
                                 <Button type="primary"
-                                    disabled={true}
+                                    disabled={this.state.currentGetInvitedIdx == -1 ? true : false}
                                     onClick={() => {
-                                        // this.autoTask();
+                                        this.getInviteId();
                                     }}>
                                     获取助力链接
                                 </Button>
                             </section>
                             <section>
-                                助力链接：<input></input>
+                                助力链接：<input value={this.state.inviteURL} readOnly={true}></input>
+                                <Button
+                                    type="primary"
+                                    disabled={this.state.inviteURL ? false : true}
+                                    onClick={() => {
+                                        copyText(this.state.inviteURL).then(() => {
+                                            this.showMessage("success", "复制成功！");
+                                        })
+                                    }}
+                                >
+                                    复制链接
+                                </Button>
                                 <Dropdown overlay={() => {
                                     return (
-                                        // <Menu onClick={this.handleMenuClick.bind(this)}>
-                                        <Menu>
+                                        <Menu onClick={this.handleDoInvitedClick.bind(this)}>
                                             {
                                                 this.state.accountInfo.map((account, idx) => (
                                                     <Menu.Item key={idx} icon={<UserOutlined />}>
-                                                        {account.nickname}
+                                                        {account.curPin}
                                                     </Menu.Item>
                                                 ))
                                             }
@@ -202,13 +225,15 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                     )
                                 }} trigger={['click']}>
                                     <Button>
-                                        选择账号 <DownOutlined />
+                                        {this.state.currentDoInvitedAccount}
+                                        <DownOutlined />
                                     </Button>
                                 </Dropdown>
+
                                 <Button type="primary"
-                                    disabled={true}
+                                    disabled={this.state.inviteURL && this.state.currentDoInvitedIdx != -1 ? false : true}
                                     onClick={() => {
-                                        // this.autoTask();
+                                        this.invited();
                                     }}>
                                     帮ta助力
                                 </Button>
@@ -413,7 +438,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         return secretp;
     }
 
-    async getTaskDetail() {
+    async getTaskDetail(log: boolean = true) {
         for (let i = 0; i < this.state.accountInfo.length; i++) {
             let account = this.state.accountInfo[i];
             let currentAccount = account.curPin;
@@ -425,7 +450,9 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             await this.setStateAsync({ taskDetailMap, currentAccount });
             let { taskVos } = taskDetail;
             let data = this.initTaskVos(taskVos);
-            this.logOutput(data);
+            if (log) {
+                this.logOutput(data);
+            }
         }
     }
 
@@ -639,6 +666,52 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         this.setState = (state, callback) => {
             return;
         };
+    }
+
+    handleInvitedClick(info: MenuInfo) {
+        let { key } = info;
+        let currentGetInvitedIdx = +key;
+        let currentGetInvitedAccount = this.state.accountInfo[currentGetInvitedIdx].curPin;
+        this.setStateAsync({
+            currentGetInvitedIdx,
+            currentGetInvitedAccount
+        })
+    }
+
+    async getInviteId() {
+        let inviteId = this.state.taskDetailMap[this.state.currentGetInvitedAccount].inviteId;
+        let inviteURL = `${DEFAULT_ACTIVITY_HOST}${TRAVEL_URL}${TRAVEL_INVITE}${inviteId}`
+        this.setStateAsync({
+            inviteURL
+        });
+    }
+
+    handleDoInvitedClick(info: MenuInfo) {
+        let { key } = info;
+        let currentDoInvitedIdx = +key;
+        let currentDoInvitedAccount = this.state.accountInfo[currentDoInvitedIdx].curPin;
+        this.setStateAsync({
+            currentDoInvitedIdx,
+            currentDoInvitedAccount
+        })
+    }
+
+    async invited() {
+        let { cookie,nickname } = this.state.accountInfo[this.state.currentDoInvitedIdx];
+        let inviteId = this.state.taskDetailMap[this.state.currentGetInvitedAccount].inviteId;
+        console.log(nickname);
+        let body = await this.getSourceRes(cookie, { inviteId });
+        let res = await collectScore(body, cookie) as IBaseResData;
+        let { success } = res.data;
+        let log = "";
+        if (success) {
+            let result = res.data.result as ICollectScore;
+            let { userScore, score } = result;
+            log = `助力成功：获得汪汪币：${score} 总获得汪汪币：${userScore}`;
+        } else {
+            log = res.data.bizMsg;
+        }
+        this.logOutput(log,false);
     }
 
     async autoTask(currentUserAgent: string) {

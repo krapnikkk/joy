@@ -21,6 +21,8 @@ export const EXTENSION_VERSION: string = "0.0.5";
 export const CONFIG_DATA_URL:string = "https://krapnik.cn/json/setting.json";
 
 export const DEFAULT_ACTIVITY_HOST:string = "https://wbbny.m.jd.com/";
+export const TRAVEL_URL:string = "babelDiy/Zeus/2vVU4E7JLH9gKYfLQ5EVW6eN2P7B/index.html";
+export const TRAVEL_INVITE:string = "?babelChannel=gjsyicon&shareType=taskHelp&inviteId=";
 
 //activity
 export const globalInfo = {

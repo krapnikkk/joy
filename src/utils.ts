@@ -238,7 +238,6 @@ export const updateHeader = (header: { [key: string]: string }, filter?: string)
                 details.requestHeaders.push({ name, value });
             }
         }
-        console.log(details);
         return { requestHeaders: details.requestHeaders };
     }
 
