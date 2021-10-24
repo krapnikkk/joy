@@ -19,3 +19,7 @@ chrome.webRequest.onHeadersReceived.addListener(
 );
 
 ## 使用外部链接的行内脚本或者iframe
+
+## 在插件中添加百度统计
+
+## 篡改userAgent
