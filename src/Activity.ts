@@ -13,7 +13,7 @@ export const toWithdraw = (cookie?: string) => {
         riskDeviceInfo,
         shareUuid,
     };
-    let reqData = getReqData(signData)
+    let reqData = getReqData(signData,true)
     let url = `${GENERIC_JR_HOST}toWithdraw?reqData=${reqData}`;
     let header = {
         "User-Agent": USER_AGENT,
@@ -83,7 +83,7 @@ export const toDailyHome = (cookie?: string) => {
         environment,
         shareUuid,
     };
-    let reqData = getReqData(signData, false, { riskDeviceInfo });
+    let reqData = getReqData(signData, true, { riskDeviceInfo });
     let url = `${GENERIC_JR_HOST}toDailyHome?reqData=${reqData}`;
     let header = {
         "User-Agent": USER_AGENT,

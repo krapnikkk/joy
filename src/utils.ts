@@ -1,6 +1,7 @@
 import axios from "axios";
 import { IEvent, IProperty } from "./@types";
 import { GMT, MINUTE_PER_DAY } from "./constants";
+// import Cookies from 'js-cookie';
 declare let AAR: any;
 const breakOn = (obj: {}, propertyName: string, mode: string | boolean, func: (val: any) => void) => {
     // this is directly from https://github.com/paulmillr/es6-shim
@@ -227,6 +228,14 @@ export const updateHeader = (header: { [key: string]: string }, filter?: string)
             let requestHeader = details.requestHeaders[i];
             for (let [name, value] of Object.entries(header)) {
                 if (value && requestHeader.name.toLowerCase() === name.toLowerCase()) {
+                    //todo 使用插件的形式做扩展
+                    if (name == "cookie") {
+                        let values = value.split(";");
+                        values.forEach((v)=>{
+                            let data = v.split("=");
+                            setCookie(data[0],data[1]);
+                        })
+                    }
                     requestHeader.value = value;
                     delete header[name];
                     break;
@@ -247,6 +256,13 @@ export const updateHeader = (header: { [key: string]: string }, filter?: string)
         ["blocking", "requestHeaders", "extraHeaders"]
     );
     return setHeader;
+}
+
+export const setCookie = (name: string, value: string): void => {
+    var Days = 30;
+    var exp = new Date();
+    exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toUTCString();
 }
 
 export const removeHeader = (callback: (details: chrome.webRequest.WebRequestHeadersDetails) => {
@@ -355,5 +371,5 @@ export const setUserAgent = (userAgent: string) => {
     //         });
     //     }
     // }
-    
+
 }

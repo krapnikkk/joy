@@ -216,13 +216,13 @@ const startScheduleTask = () => {
 
 const startActivityTask = async () => {
     if (!dailySignInFlag) {
-        // await queueTask(autoToWithdraw);
+        await queueTask(autoToWithdraw);
         dailySignInFlag = true;
     } else {
-        // await queueTask(toWithdraw);
+        await queueTask(toWithdraw);
     }
-    // await queueTask(pigPetOpenBox);
-    // await queueTask(autoHarvest);
+    await queueTask(pigPetOpenBox);
+    await queueTask(autoHarvest);
 }
 
 // updateHeader({ "Access-Control-Allow-Origin": "*" });

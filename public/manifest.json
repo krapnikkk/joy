@@ -26,11 +26,12 @@
   "background": {
     "scripts": [
       "assets/aar.min.js",
+      "assets/JdJrTdRiskFinger.js",
       "js/background.bundle.js"
     ],
     "persistent": true
   },
-  "content_security_policy": "script-src 'self' https://hmcdn.baidu.com/static/tongji/plugins/UrlChangeTracker.js 'sha256-ngYUFN/gnBCYWfctUC7OzyfejPDiN7a1svF+mYFUGiI=' 'unsafe-eval'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://hmcdn.baidu.com; object-src 'self'",
   "web_accessible_resources": [
     "js/inject.bundle.js"
   ],
