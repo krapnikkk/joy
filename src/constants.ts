@@ -23,7 +23,7 @@ export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key","3AB9D23F7A4B3
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
 export const ACTION_HOST:string = "https://api.m.jd.com/client.action?";
 
-export const EXTENSION_VERSION: string = "0.0.6";
+export const EXTENSION_VERSION: string = "0.0.7";
 export const CONFIG_DATA_URL:string = "https://krapnik.cn/json/setting.json";
 
 export const DEFAULT_ACTIVITY_HOST:string = "https://wbbny.m.jd.com/";

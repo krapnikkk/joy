@@ -8,7 +8,7 @@ import TextArea from 'antd/lib/input/TextArea';
 import { collectAtuoScore, collectScore, getBadgeAward, getFeedDetail, getHomeData, getTaskDetail, miMissions, raise, sign } from '@src/Activity';
 import { DateTime } from 'luxon';
 import { IAddProductVos, ICollectAtuoScore, ICollectScore, IMiMission, IMyAwardVos, IRaise, ISignRes, ITaskDetail, ITaskVos } from './typing';
-import { DEFAULT_ACTIVITY_HOST, JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, MINIPROGRAM_USER_AGENT, TRAVEL_INVITE, TRAVEL_URL } from '@src/constants';
+import { DEFAULT_ACTIVITY_HOST, JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, TRAVEL_INVITE, TRAVEL_URL } from '@src/constants';
 import { MenuInfo } from 'rc-menu/lib/interface';
 
 interface IState {
@@ -33,7 +33,7 @@ interface IState {
 interface IProps {
 }
 
-export default class Travel extends React.Component<IProps, IState, {}> {
+export default class Journey extends React.Component<IProps, IState, {}> {
     constructor(props: IProps | Readonly<IProps>) {
         super(props);
         this.state = {
@@ -67,10 +67,10 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             <section>
                 <PageHeader
                     ghost={true}
-                    title="热爱环游记"
+                    title="热爱奇旅"
                     extra={[
                         <Button key="1" type={'primary'} onClick={() => {
-                            openWindow("https://wbbny.m.jd.com/babelDiy/Zeus/2fUope8TDN3dUJfNzQswkBLc7uE8/index.html")
+                            openWindow("https://wbbny.m.jd.com/babelDiy/Zeus/2vVU4E7JLH9gKYfLQ5EVW6eN2P7B/index.html")
                         }}>跳转活动</Button>,
                     ]}
                 ></PageHeader>
@@ -81,13 +81,14 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                     </Card>
                     <Card>
                         <section className="setting-item">
+                            <Divider>任务相关</Divider>
                             <section>
                                 <Button type="primary" onClick={() => {
-                                    this.autoTask(JDAPP_USER_AGENT);
+                                    this.autoTask();
                                 }}>
-                                    一键完成【商城端】
+                                    一键完成
                                 </Button>
-                                <Button type="primary" onClick={() => {
+                                {/* <Button type="primary" onClick={() => {
                                     this.autoTask(MINIPROGRAM_USER_AGENT);
                                 }}>
                                     一键完成【小程序端】
@@ -97,26 +98,26 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                         this.autoTask(JDJRAPP_USER_AGENT);
                                     }}>
                                     一键完成【金融端】
-                                </Button>
+                                </Button> */}
                             </section>
                             <section>
-                                <Button type="primary"
+                                {/* <Button type="primary"
                                     onClick={() => {
                                         this.raise();
                                     }}>
                                     查看账号信息
-                                </Button>
+                                </Button> */}
                                 <Button type="primary"
                                     onClick={() => {
                                         this.raise();
                                     }}>
-                                    打卡领红包
+                                    消耗金币抽奖
                                 </Button>
                                 <Button type="primary"
                                     onClick={() => {
                                         this.collectAtuoScore();
                                     }}>
-                                    收取汪汪币
+                                    收取金币
                                 </Button>
                                 <Button type="primary" onClick={() => {
                                     this.getTaskDetail();
@@ -145,7 +146,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                                     <Radio value={1}>240</Radio>
                                     <Radio value={2}>300</Radio>
                                 </Radio.Group>
-                                定时收取汪汪币：
+                                定时收取金币：
                                 <Switch
                                     size="small"
                                     checked={this.state.scheduleSwitch}
@@ -338,7 +339,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 let result = res.data.result as ISignRes;
                 let { scoreResult } = result;
                 let { score, totalScore } = scoreResult;
-                log = `签到成功！获得汪汪币：${score} 总获得汪汪币：${totalScore}`;
+                log = `签到成功！获得金币：${score} 总获得金币：${totalScore}`;
             } else {
                 log = res.data.bizMsg;
             }
@@ -353,22 +354,24 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             let currentAccount = account.curPin;
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
-            let body = await this.getSourceRes(cookie);
+            let body = await this.getSourceRes(cookie, { "scenceId": 1 });
             let res = await raise(body, cookie) as IBaseResData;
             let { success } = res.data;
             let log = "";
             if (success) {
                 let result = res.data.result as IRaise;
-                let { raiseInfo, levelUpAward } = result;
-                let { totalScore, usedScore } = raiseInfo;
-                let { score, couponInfo, redpacketInfo, type } = levelUpAward;
-                log = `打卡成功！获得汪汪币：${score} 当前汪汪币：${+totalScore - (+usedScore)}`;
+                let { levelUpAward } = result;
+                // let { totalScore, usedScore } = raiseInfo;
+
+                let { couponInfo, redpacketInfo, type, card } = levelUpAward;
+                let { name } = card;
+                log = `抽奖成功！获得卡片：【${name}】`;
                 if (type == 4) {
                     let { value } = redpacketInfo;
                     log += `\n获得红包：${value}`
-                } else if (type == 8) {
-                    let { name, usageThreshold, quota } = couponInfo;
-                    log += `\n获得优惠券：【${name}】${usageThreshold}-${quota}`
+                } else if (type == 2) {
+                    let { usageThreshold, quota } = couponInfo;
+                    log += `\n获得优惠券：${usageThreshold}-${quota}`
                 }
             } else {
                 log = res.data.bizMsg;
@@ -413,7 +416,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                             if (success) {
                                 let myAwardVo = res.data.result.myAwardVos[0] as IMyAwardVos;
                                 let { score } = myAwardVo.pointVo;
-                                log = `领取成功！获得汪汪币：${score}`;
+                                log = `领取成功！获得金币：${score}`;
                             } else {
                                 log = res.data.bizMsg;
                             }
@@ -511,7 +514,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             if (success) {
                 let result = res.data.result as ICollectAtuoScore;
                 let { produceScore } = result;
-                log = `已收取汪汪币：${produceScore}`;
+                log = `已收取金币：${produceScore}`;
             } else {
                 log = res.data.bizMsg;
             }
@@ -546,7 +549,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 if (success) {
                     let result = res.data.result as ICollectScore;
                     let { userScore, score } = result;
-                    log = `任务进度：${j + 1}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
+                    log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 总获得金币：${userScore}`;
                 } else {
                     log = res.data.bizMsg;
                 }
@@ -601,7 +604,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         let random = getRandom();
         let extraData = {
             log: "",
-            sceneid: "HYJhPageh5"
+            sceneid: "RAhomePageh5"
         };
         let ss = {
             extraData,
@@ -630,10 +633,10 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             this.scheduleTimer = window.setInterval(() => {
                 this.collectAtuoScore();
             }, timeout);
-            log = "已开启定时自动收取汪汪币";
+            log = "已开启定时自动收取金币";
         } else {
             window.clearInterval(this.scheduleTimer);
-            log = "已关闭定时自动收取汪汪币";
+            log = "已关闭定时自动收取金币";
         }
         this.logOutput(log, false);
     }
@@ -652,7 +655,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
             // let 
             let timeout = this.state.scheduleSpan == 1 ? 30 * 60 * 1000 : 60 * 60 * 1000;
             this.autoTaskTimer = window.setInterval(() => {
-                this.autoTask(JDAPP_USER_AGENT);
+                this.autoTask();
             }, timeout);
             log = "已开启定时自动完成任务";
         } else {
@@ -697,7 +700,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
     }
 
     async invited() {
-        let { cookie,nickname } = this.state.accountInfo[this.state.currentDoInvitedIdx];
+        let { cookie, nickname } = this.state.accountInfo[this.state.currentDoInvitedIdx];
         let inviteId = this.state.taskDetailMap[this.state.currentGetInvitedAccount].inviteId;
         console.log(nickname);
         let body = await this.getSourceRes(cookie, { inviteId });
@@ -707,30 +710,41 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         if (success) {
             let result = res.data.result as ICollectScore;
             let { userScore, score } = result;
-            log = `助力成功：获得汪汪币：${score} 总获得汪汪币：${userScore}`;
+            log = `助力成功：获得金币：${score} 总获得金币：${userScore}`;
         } else {
             log = res.data.bizMsg;
         }
-        this.logOutput(log,false);
+        this.logOutput(log, false);
     }
 
-    async autoTask(currentUserAgent: string) {
-        await this.setStateAsync({
-            currentUserAgent
-        });
+    async autoTask() {
+        let currentUserAgent: string = JDAPP_USER_AGENT;
+
+        // 重复自动任务五次
         this.logOutput("开始一键完成任务！", false);
-        if (currentUserAgent == JDJRAPP_USER_AGENT) {
-            await this.miMissions();
-        } else {
-            await this.getTaskDetail();
-            await this.taskHandler();
+        for (let i = 0; i < 5; i++) {
+            await this.setStateAsync({
+                currentUserAgent
+            });
+            
+            if (currentUserAgent == JDJRAPP_USER_AGENT) {
+                await this.miMissions();
+            } else {
+                await this.getTaskDetail();
+                await this.taskHandler();
+            }
+            if (currentUserAgent == JDAPP_USER_AGENT) { // todo 
+                await this.getBadgeAward();
+            }
         }
-        if (currentUserAgent == JDAPP_USER_AGENT) { // todo 
-            await this.getBadgeAward();
-        }
+
+
+
         this.logOutput(`结束一键完成任务！`, false);
         this.showMessage("success", "任务已完成！");
     }
+
+
 
     async taskHandler(type?: number) {
         for (let i = 0; i < this.state.accountInfo.length; i++) {
@@ -808,7 +822,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 if (success) {
                     let result = res.data.result as ICollectScore;
                     let { userScore, score } = result;
-                    log = `任务进度：${j + 1}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
+                    log = `任务进度：${j + 1}/${maxTimes} 获得金币：${score} 总获得金币：${userScore}`;
                 } else {
                     log = res.data.bizMsg;
                 }
@@ -854,7 +868,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
                 if (success) {
                     let result = res.data.result as ICollectScore;
                     let { userScore, maxTimes, times, score } = result;
-                    log = `任务进度：${times}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
+                    log = `任务进度：${times}/${maxTimes} 获得金币：${score} 总获得金币：${userScore}`;
                 } else {
                     log = res.data.bizMsg;
                 }
@@ -878,7 +892,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
         if (success) {
             let result = res.data.result as ICollectScore;
             let { userScore, maxTimes, times, score } = result;
-            log = `任务进度：${times}/${maxTimes} 获得汪汪币：${score} 总获得汪汪币：${userScore}`;
+            log = `任务进度：${times}/${maxTimes} 获得金币：${score} 总获得金币：${userScore}`;
         } else {
             log = res.data.bizMsg;
         }
@@ -890,7 +904,7 @@ export default class Travel extends React.Component<IProps, IState, {}> {
 
     async throlle(delay?: number) {
         if (!delay) {
-            delay = rnd(1, 3);
+            delay = rnd(10, 12);
         }
         let log = `随机模拟等待中,${delay}秒后提交~`;
         this.logOutput(log);

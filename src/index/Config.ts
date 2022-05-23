@@ -1,12 +1,12 @@
 import { IActivity } from "@src/@types";
 import Goose from "./components/Activity/btgoose";
-import Travel from "./components/Activity/Travel";
+import Journey from "./components/Activity/Journey";
 // import PetPig from "./components/Activity/PetPig";
 
 export const activityInfo:IActivity[] = [
     {
-        "name":"热爱环游记",
-        "component":Travel
+        "name":"热爱奇旅",
+        "component":Journey
     },
     {
         "name":"天天提鹅",
