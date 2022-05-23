@@ -210,7 +210,7 @@ export const _post = (url: string, data: {}, header?: { [key: string]: string })
             resolve(res.data);
         }).catch((e) => {
             console.warn(e);
-            alert("接口异常！请重新开始执行之前的操作！");
+            alert("接口请求异常！请重新开始执行之前的操作！");
             reject(e);
         })
     })
@@ -218,6 +218,7 @@ export const _post = (url: string, data: {}, header?: { [key: string]: string })
 
 export const post = async (url: string, data: {}, header?: { [key: string]: string }) => {
     let handler = updateHeader(header);
+    await sleep(500);
     let res = await _post(url, data);
     await sleep(500); 
     removeHeader(handler);

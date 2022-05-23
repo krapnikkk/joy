@@ -32,7 +32,6 @@ export default class Account extends React.Component<IProps, IState, {}> {
 
   addEvent() {
     chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
-      // console.log(request);
       switch (request.type) {
         case GET_COOKIES_SUCCESS:
           this.getAccountInfoAsync(false);

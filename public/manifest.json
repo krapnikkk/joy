@@ -43,10 +43,11 @@
         "https://wbbny.m.jd.com/*"
       ],
       "js": [
+        "assets/JdJrTdRiskFinger.js",
         "js/content.bundle.js"
       ],
       "all_frames": true,
-      "run_at": "document_start"
+      "run_at": "document_end"
     }
   ]
 }

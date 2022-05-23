@@ -1,6 +1,6 @@
 import { DEFAULT_ACTIVITY_HOST, HOME_PAGE, LOGIN_PAGE, MARK, SCENE_VAL } from "@src/constants";
 import { CLOSE_LOGIN_WINDOW, LOGIN_SUCCESS } from "@src/Events"
-import { injectCustomJs, postChromeMessage } from "@src/utils"
+import { injectCustomJs, postChromeMessage, sleep } from "@src/utils"
 
 // import { injectCustomJs } from '../utils';
 function init() {
@@ -12,7 +12,7 @@ function init() {
                 })
             }
         }
-        if (location.href.indexOf(`${HOME_PAGE}?${SCENE_VAL}`) > -1) {
+        if (location.href.indexOf(`${HOME_PAGE}?${SCENE_VAL}`) == 0) {
             postChromeMessage({
                 type: LOGIN_SUCCESS
             })
@@ -30,9 +30,14 @@ function init() {
 
 if (document.readyState === 'loading') {
     onLoading();
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', delayInit);
 } else {
-    init()
+    delayInit()
+}
+
+async function delayInit(){
+    await sleep(2000);
+    init();
 }
 
 function onLoading() {

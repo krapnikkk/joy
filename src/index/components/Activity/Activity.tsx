@@ -1,7 +1,7 @@
 import { message, Tabs } from 'antd';
 import * as React from 'react'
 import './Activity.css';
-import { AUTO_GET_COOKIES, GET_COOKIES_SUCCESS, LOGIN } from '@src/Events';
+import { AUTO_GET_COOKIES, LOGIN } from '@src/Events';
 import { copyText, localStoragePromise } from '@src/utils';
 import { IAccount } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
@@ -29,15 +29,14 @@ export default class Activity extends React.Component<IProps, IState, {}> {
 
   addEvent() {
     chrome.runtime.onMessage.addListener((request, _sender: chrome.runtime.MessageSender, sendResponse) => {
-      console.log(request);
       switch (request.type) {
-        case GET_COOKIES_SUCCESS:
-          this.getAccountInfoAsync(false);
-          message.success('获取cookies成功！');
-          break;
-        default:
-          console.log(request)
-          break;
+        // case GET_COOKIES_SUCCESS:
+        //   this.getAccountInfoAsync(false);
+        //   message.success('获取cookies成功！');
+        //   break;
+        // default:
+        //   console.log(request)
+        //   break;
       }
     });
   }

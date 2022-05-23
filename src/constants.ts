@@ -10,7 +10,7 @@ export const HOME_PAGE: string = "https://home.m.jd.com/myJd/newhome.action";
 export const USER_INFO_URL: string = "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion";
 export const GITHUB_URL: string = `https://ghbtns.com/github-btn.html?user=krapnikkk&repo=${EXTENSION_NAME}&type=star`;
 export const MARK: string = "mark";
-export const SCENE_VAL: string = `sceneval=2&ufc=&${MARK}`;
+export const SCENE_VAL: string = `${MARK}`;
 export const ACTIVITY_TASK_INTERVAL: number = 5;
 export const MINUTE_PER_DAY:number = 1440;
 export const GMT: number = +8;
