@@ -2,10 +2,10 @@ import { ACTION_HOST, GENERIC_JR_HOST, globalInfo, USER_AGENT, JDAPP_USER_AGENT,
 import { get, getReqData, post } from "./utils";
 
 export const toWithdraw = (cookie?: string) => {
-    let { environment, eid, fp, channelLv, shareUuid } = globalInfo;
+    let { environment, eid, fp, channelLv, shareUuid,token } = globalInfo;
     let riskDeviceInfo = JSON.stringify({
         eid,
-        fp
+        fp,token
     });
     let signData = {
         channelLv,
@@ -18,6 +18,7 @@ export const toWithdraw = (cookie?: string) => {
     let header = {
         "User-Agent": USER_AGENT,
         "Referer": "https://active.jd.com/",
+        "origin": "https://active.jd.com/",
         cookie
     };
     return get(url, header);
@@ -30,10 +31,11 @@ export const autoToWithdraw = async (cookie?: string) => {
 }
 
 export const toGoldExchange = (cookie?: string) => {
-    let { environment, eid, fp, channelLv, shareUuid } = globalInfo;
+    let { environment, eid, fp, channelLv, shareUuid,token } = globalInfo;
     let riskDeviceInfo = JSON.stringify({
         eid,
-        fp
+        fp,
+        token
     });
     let signData = {
         channelLv,
@@ -46,48 +48,55 @@ export const toGoldExchange = (cookie?: string) => {
     let header = {
         "User-Agent": USER_AGENT,
         "Referer": "https://active.jd.com/",
+        "origin": "https://active.jd.com/",
         cookie
     };
     return get(url, header);
 }
 
 export const toDailySignIn = (cookie?: string) => {
-    let { environment, eid, fp, channelLv, shareUuid } = globalInfo;
+    let { environment, eid, fp, channelLv, shareUuid,token } = globalInfo;
+    let riskDeviceInfo = JSON.stringify({
+        eid,
+        fp,
+        token
+    });
     let signData = {
         channelLv,
         environment,
+        riskDeviceInfo,
         shareUuid,
     };
-    let riskDeviceInfo = JSON.stringify({
-        eid,
-        fp
-    });
-    let reqData = getReqData(signData, true, { riskDeviceInfo });
+    // let reqData = getReqData(signData, true, { riskDeviceInfo });
+    let reqData = getReqData(signData, true);
     let url = `${GENERIC_JR_HOST}toDailySignIn?reqData=${reqData}`;
     let header = {
         "User-Agent": USER_AGENT,
         "Referer": "https://active.jd.com/",
+        "origin": "https://active.jd.com/",
         cookie
     };
     return get(url, header);
 }
 
 export const toDailyHome = (cookie?: string) => {
-    let { environment, eid, fp, channelLv, shareUuid } = globalInfo;
+    let { environment, eid, fp, channelLv, shareUuid,token } = globalInfo;
     let riskDeviceInfo = JSON.stringify({
         eid,
-        fp
+        fp,token
     });
     let signData = {
         channelLv,
         environment,
+        riskDeviceInfo,
         shareUuid,
     };
-    let reqData = getReqData(signData, true, { riskDeviceInfo });
+    let reqData = getReqData(signData, true);
     let url = `${GENERIC_JR_HOST}toDailyHome?reqData=${reqData}`;
     let header = {
         "User-Agent": USER_AGENT,
         "Referer": "https://active.jd.com/",
+        "origin": "https://active.jd.com/",
         cookie
     };
     return get(url, header);
@@ -102,6 +111,7 @@ export const pigPetOpenBox = (cookie?: string) => {
     let header = {
         "User-Agent": USER_AGENT,
         "Referer": "https://active.jd.com/",
+        "origin": "https://active.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
@@ -124,6 +134,7 @@ export const login = (key: string, cookie?: string) => {
     let header = {
         "User-Agent": USER_AGENT,
         "Referer": "https://active.jd.com/",
+        "origin": "https://active.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
@@ -143,6 +154,7 @@ export const harvest = (key: string, cookie?: string) => {
     let header = {
         "User-Agent": USER_AGENT,
         "Referer": "https://active.jd.com/",
+        "origin": "https://active.jd.com/",
         cookie,
         "Content-type": "application/x-www-form-urlencoded"
     };
@@ -162,7 +174,6 @@ export const getHomeData = async (cookie?: string, userAgent: string = JDAPP_USE
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
     let body = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ?{"appSign":"2"}:{};
     let data = `functionId=${functionId}&client=m&clientVersion=-1&appid=signed_wh5&body=${JSON.stringify(body)}`;
-             //functionId=promote_getHomeData&client=m&clientVersion=-1&appid=signed_wh5&body={}
     let url = `${ACTION_HOST}${api}=${functionId}`;
     let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
     let header = {
@@ -176,6 +187,40 @@ export const getHomeData = async (cookie?: string, userAgent: string = JDAPP_USE
     return post(url, data, header);
 }
 
+export const getPKHomeData = async (cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
+    let functionId = "promote_pk_getHomeData";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
+    let body = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ?{"appSign":"2"}:{};
+    let data = `functionId=${functionId}&client=m&clientVersion=-1&appid=signed_wh5&body=${JSON.stringify(body)}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
+    let header = {
+        "User-Agent": userAgent,
+        "Referer": "https://wbbny.m.jd.com/",
+        "origin": "https://wbbny.m.jd.com/",
+        ...args,
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+export const JoinGroup = async (body: string,cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
+    let functionId = "promote_pk_joinGroup";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
+    let data = `functionId=${functionId}&client=m&clientVersion=-1&appid=signed_wh5&body=${body}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
+    let header = {
+        "User-Agent": userAgent,
+        "Referer": "https://wbbny.m.jd.com/",
+        "origin": "https://wbbny.m.jd.com/",
+        ...args,
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
 export const getTaskDetail = async (cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "promote_getTaskDetail";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";

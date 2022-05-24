@@ -3,6 +3,11 @@ import { IEvent, IProperty } from "./@types";
 import { GMT, MINUTE_PER_DAY } from "./constants";
 // import Cookies from 'js-cookie';
 declare let AAR: any;
+declare let AAR2: any;
+
+if(typeof AAR2 != 'undefined'){
+    AAR2.init((err:string)=>{console.log(err)});
+}
 const breakOn = (obj: {}, propertyName: string, mode: string | boolean, func: (val: any) => void) => {
     // this is directly from https://github.com/paulmillr/es6-shim
     function getPropertyDescriptor(obj: {}, name: string) {
@@ -285,7 +290,7 @@ export const getResponse = () => {
 }
 
 export const getSignature = (signData: {}) => {
-    let aar = new AAR();
+    let aar = new AAR2();
     let nonce = aar.nonce();
     let signature = aar.sign(JSON.stringify(signData), nonce);
     return {

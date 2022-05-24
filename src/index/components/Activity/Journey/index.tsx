@@ -1,20 +1,22 @@
 import * as React from 'react';
-import { Button, Card, Divider, Dropdown, Menu, message, PageHeader, Radio, RadioChangeEvent, Switch, } from 'antd';
+import { Button, Card, Divider, Dropdown, Menu, message, PageHeader, Popover, Radio, RadioChangeEvent, Switch, Image } from 'antd';
 import { UserOutlined, DownOutlined } from "@ant-design/icons";
-import { copyText, getRandom, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
+import { getRandom, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
 import { IAccount, IActivityResData, IBaseResData, ILocalStorageData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
 import TextArea from 'antd/lib/input/TextArea';
-import { collectAtuoScore, collectScore, getBadgeAward, getFeedDetail, getHomeData, getTaskDetail, miMissions, raise, sign } from '@src/Activity';
+import { collectAtuoScore, collectScore, getBadgeAward, getFeedDetail, getHomeData, getPKHomeData, getTaskDetail, JoinGroup, miMissions, raise, sign } from '@src/Activity';
 import { DateTime } from 'luxon';
 import { IAddProductVos, ICollectAtuoScore, ICollectScore, IMiMission, IMyAwardVos, IRaise, ISignRes, ITaskDetail, ITaskVos } from './typing';
-import { DEFAULT_ACTIVITY_HOST, JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, TRAVEL_INVITE, TRAVEL_URL } from '@src/constants';
+import { DEFAULT_ACTIVITY_HOST, JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, TEAM_TRAVEL_INVITE, TRAVEL_INVITE, TRAVEL_URL } from '@src/constants';
 import { MenuInfo } from 'rc-menu/lib/interface';
+import * as QRCode from 'qrcode'
 
 interface IState {
     accountInfo: IAccount[];
     accountMap: { [key: string]: IAccount };
     secretpMap: { [key: string]: string };
+    groupInfoMap: { [key: string]: string };
     currentAccount: string;
     taskDetailMap: { [key: string]: ITaskDetail };
     miMissionMap: { [key: string]: IMiMission };
@@ -28,7 +30,14 @@ interface IState {
     currentGetInvitedAccount: string;
     currentDoInvitedIdx: number;
     currentDoInvitedAccount: string;
+    currentDoTeamInvitedIdx: number;
+    currentDoTeamInvitedAccount: string;
     inviteURL: string;
+    teamInviteURL: string;
+    currentGetTeamInvitedIdx: number,
+    currentGetTeamInvitedAccount: string,
+    teamInviteURLQrCode: string,
+    inviteURLQrCode: string
 }
 interface IProps {
 }
@@ -41,6 +50,7 @@ export default class Journey extends React.Component<IProps, IState, {}> {
             currentAccount: "",
             accountMap: {},
             secretpMap: {},
+            groupInfoMap: {},
             taskDetailMap: {},
             miMissionMap: {},
             log: "",
@@ -51,9 +61,16 @@ export default class Journey extends React.Component<IProps, IState, {}> {
             currentUserAgent: JDAPP_USER_AGENT,
             currentGetInvitedIdx: -1,
             currentGetInvitedAccount: "选择账号",
+            currentGetTeamInvitedIdx: -1,
+            currentGetTeamInvitedAccount: "选择账号",
             currentDoInvitedIdx: -1,
             currentDoInvitedAccount: "选择账号",
-            inviteURL: ""
+            currentDoTeamInvitedIdx: -1,
+            currentDoTeamInvitedAccount: "选择账号",
+            inviteURL: "",
+            teamInviteURL: "",
+            teamInviteURLQrCode: "",
+            inviteURLQrCode: ""
         };
     }
 
@@ -201,17 +218,20 @@ export default class Journey extends React.Component<IProps, IState, {}> {
                             </section>
                             <section>
                                 助力链接：<input value={this.state.inviteURL} readOnly={true}></input>
-                                <Button
-                                    type="primary"
-                                    disabled={this.state.inviteURL ? false : true}
-                                    onClick={() => {
-                                        copyText(this.state.inviteURL).then(() => {
-                                            this.showMessage("success", "复制成功！");
-                                        })
-                                    }}
-                                >
-                                    复制链接
-                                </Button>
+                                <Popover placement="bottom"
+                                    content={(<Image
+                                        preview={false}
+                                        src={this.state.inviteURLQrCode}
+                                        width={200}
+                                    />)
+                                    } title="" trigger="hover">
+                                    <Button
+                                        type="primary"
+                                        disabled={this.state.inviteURLQrCode ? false : true}
+                                    >
+                                        使用京东APP扫码
+                                    </Button>
+                                </Popover>
                                 <Dropdown overlay={() => {
                                     return (
                                         <Menu onClick={this.handleDoInvitedClick.bind(this)}>
@@ -230,57 +250,68 @@ export default class Journey extends React.Component<IProps, IState, {}> {
                                         <DownOutlined />
                                     </Button>
                                 </Dropdown>
-
                                 <Button type="primary"
                                     disabled={this.state.inviteURL && this.state.currentDoInvitedIdx != -1 ? false : true}
                                     onClick={() => {
+                                        if(this.state.currentDoInvitedIdx == this.state.currentGetInvitedIdx){
+                                            this.logOutput("不能自己为自己助力!",false);
+                                            return;
+                                        }
                                         this.invited();
                                     }}>
                                     帮ta助力
-                                </Button>
-                                <Button type="primary"
-                                    disabled={true}
-                                    onClick={() => {
-                                        // this.autoTask();
-                                    }}>
-                                    帮作者助力
                                 </Button>
                             </section>
                             <Divider>组队相关</Divider>
                             <section>
                                 <Dropdown overlay={() => {
-                                    return (<Menu>
+                                    return (<Menu onClick={this.handleTeamInvitedClick.bind(this)}>
                                         {
                                             this.state.accountInfo.map((account, idx) => (
                                                 <Menu.Item key={idx} icon={<UserOutlined />}>
-                                                    {account.nickname}
+                                                    {account.curPin}
                                                 </Menu.Item>
                                             ))
                                         }
                                     </Menu>)
                                 }} trigger={['click']}>
                                     <Button>
-                                        选择账号 <DownOutlined />
+                                        {this.state.currentGetTeamInvitedAccount}
+                                        <DownOutlined />
                                     </Button>
                                 </Dropdown>
                                 <Button type="primary"
-                                    disabled={true}
+                                    disabled={this.state.currentGetTeamInvitedIdx == -1 ? true : false}
                                     onClick={() => {
-                                        // this.autoTask();
+                                        this.getTeamInvitedId();
                                     }}>
                                     获取组队链接
                                 </Button>
                             </section>
                             <section>
-                                组队链接：<input></input>
+                                组队链接：<input value={this.state.teamInviteURL} readOnly={true}></input>
+                                <Popover placement="bottom"
+                                    content={(<Image
+                                        preview={false}
+                                        src={this.state.teamInviteURLQrCode}
+                                        width={200}
+                                    />)
+                                    } title="" trigger="hover">
+                                    <Button
+                                        type="primary"
+                                        disabled={this.state.teamInviteURLQrCode ? false : true}
+                                    >
+                                        使用京东APP扫码
+                                    </Button>
+                                </Popover>
+
                                 <Dropdown overlay={() => {
                                     return (
-                                        // <Menu onClick={this.handleMenuClick.bind(this)}>
-                                        <Menu>
+                                        <Menu onClick={this.handleDoTeamInvitedClick.bind(this)}>
                                             {
                                                 this.state.accountInfo.map((account, idx) => (
                                                     <Menu.Item key={idx} icon={<UserOutlined />}>
-                                                        {account.nickname}
+                                                        {account.curPin}
                                                     </Menu.Item>
                                                 ))
                                             }
@@ -288,22 +319,20 @@ export default class Journey extends React.Component<IProps, IState, {}> {
                                     )
                                 }} trigger={['click']}>
                                     <Button>
-                                        选择账号 <DownOutlined />
+                                        {this.state.currentDoTeamInvitedAccount}
+                                        <DownOutlined />
                                     </Button>
                                 </Dropdown>
                                 <Button type="primary"
-                                    disabled={true}
+                                    disabled={this.state.teamInviteURL && this.state.currentDoTeamInvitedIdx != -1 ? false : true}
                                     onClick={() => {
-                                        // this.autoTask();
+                                        if(this.state.currentDoTeamInvitedIdx == this.state.currentGetTeamInvitedIdx){
+                                            this.logOutput("不能自己加入自己的队伍!",false);
+                                            return;
+                                        }
+                                        this.joinGroup();
                                     }}>
                                     加入队伍
-                                </Button>
-                                <Button type="primary"
-                                    disabled={true}
-                                    onClick={() => {
-                                        // this.autoTask();
-                                    }}>
-                                    加入作者队伍
                                 </Button>
                             </section>
                             <TextArea rows={10} value={this.state.log} />
@@ -323,6 +352,15 @@ export default class Journey extends React.Component<IProps, IState, {}> {
         let { secretp } = homeMainInfo;
         secretpMap[currentAccount] = secretp;
         return secretp;
+    }
+
+    async getPKHomeData(cookie?: string) {
+        let { currentGetTeamInvitedAccount, groupInfoMap } = this.state;
+        let res = await getPKHomeData(cookie, this.state.currentUserAgent) as IBaseResData;
+        let result = res.data.result;
+        let { groupInfo } = result;
+        let { groupJoinInviteId } = groupInfo;
+        groupInfoMap[currentGetTeamInvitedAccount] = groupJoinInviteId;
     }
 
     async sign() {
@@ -681,11 +719,50 @@ export default class Journey extends React.Component<IProps, IState, {}> {
         })
     }
 
+    handleTeamInvitedClick(info: MenuInfo) {
+        let { key } = info;
+        let currentGetTeamInvitedIdx = +key;
+        let currentGetTeamInvitedAccount = this.state.accountInfo[currentGetTeamInvitedIdx].curPin;
+        this.setStateAsync({
+            currentGetTeamInvitedIdx,
+            currentGetTeamInvitedAccount
+        })
+    }
+
     async getInviteId() {
         let inviteId = this.state.taskDetailMap[this.state.currentGetInvitedAccount].inviteId;
         let inviteURL = `${DEFAULT_ACTIVITY_HOST}${TRAVEL_URL}${TRAVEL_INVITE}${inviteId}`
+        QRCode.toDataURL(inviteURL, (err, inviteURLQrCode) => {
+            if (err) {
+                console.warn(err);
+                return;
+            }
+            this.setStateAsync({
+                inviteURLQrCode
+            });
+        })
         this.setStateAsync({
             inviteURL
+        });
+    }
+
+    async getTeamInvitedId() {
+        let { currentGetTeamInvitedAccount, accountMap } = this.state;
+        let { cookie } = accountMap[currentGetTeamInvitedAccount];
+        await this.getPKHomeData(cookie);// 获取当前选择ck的账号
+        let inviteId = this.state.groupInfoMap[this.state.currentGetTeamInvitedAccount];
+        let teamInviteURL = `${DEFAULT_ACTIVITY_HOST}${TRAVEL_URL}${TEAM_TRAVEL_INVITE}${inviteId}`
+        QRCode.toDataURL(teamInviteURL, (err, teamInviteURLQrCode) => {
+            if (err) {
+                console.warn(err);
+                return;
+            }
+            this.setStateAsync({
+                teamInviteURLQrCode
+            });
+        })
+        this.setStateAsync({
+            teamInviteURL
         });
     }
 
@@ -699,10 +776,19 @@ export default class Journey extends React.Component<IProps, IState, {}> {
         })
     }
 
+    handleDoTeamInvitedClick(info: MenuInfo) {
+        let { key } = info;
+        let currentDoTeamInvitedIdx = +key;
+        let currentDoTeamInvitedAccount = this.state.accountInfo[currentDoTeamInvitedIdx].curPin;
+        this.setStateAsync({
+            currentDoTeamInvitedIdx,
+            currentDoTeamInvitedAccount
+        })
+    }
+
     async invited() {
-        let { cookie, nickname } = this.state.accountInfo[this.state.currentDoInvitedIdx];
+        let { cookie } = this.state.accountInfo[this.state.currentDoInvitedIdx];
         let inviteId = this.state.taskDetailMap[this.state.currentGetInvitedAccount].inviteId;
-        console.log(nickname);
         let body = await this.getSourceRes(cookie, { inviteId });
         let res = await collectScore(body, cookie) as IBaseResData;
         let { success } = res.data;
@@ -711,6 +797,23 @@ export default class Journey extends React.Component<IProps, IState, {}> {
             let result = res.data.result as ICollectScore;
             let { userScore, score } = result;
             log = `助力成功：获得金币：${score} 总获得金币：${userScore}`;
+        } else {
+            log = res.data.bizMsg;
+        }
+        this.logOutput(log, false);
+    }
+
+    async joinGroup() {
+        let { cookie } = this.state.accountInfo[this.state.currentDoTeamInvitedIdx];
+        let inviteId = this.state.groupInfoMap[this.state.currentGetTeamInvitedAccount];
+        let body = await this.getSourceRes(cookie, { inviteId, confirmFlag: 1 });
+        let res = await JoinGroup(body, cookie) as IBaseResData;
+        let { success } = res.data;
+        let log = "";
+        if (success) {
+            let result = res.data.result as ICollectScore;
+            // let { userScore, score } = result;
+            log = `组队结果：${JSON.stringify(result)}`;
         } else {
             log = res.data.bizMsg;
         }
@@ -726,7 +829,7 @@ export default class Journey extends React.Component<IProps, IState, {}> {
             await this.setStateAsync({
                 currentUserAgent
             });
-            
+
             if (currentUserAgent == JDJRAPP_USER_AGENT) {
                 await this.miMissions();
             } else {
