@@ -15,7 +15,6 @@
     "webRequest",
     "webRequestBlocking",
     "storage",
-    "clipboardWrite",
     "*://*.jd.com/*",
     "*://.jd.com/*",
     "*://krapnik.cn/*"
@@ -25,7 +24,7 @@
   },
   "background": {
     "scripts": [
-      "assets/aar.min.js",
+      "assets/aar2.min.js",
       "assets/JdJrTdRiskFinger.js",
       "js/background.bundle.js"
     ],
