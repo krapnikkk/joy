@@ -23,19 +23,23 @@ export const COOKIE_KEYS:string[] = ["pt_pin","pt_token","pt_key","3AB9D23F7A4B3
 export const GENERIC_JR_HOST:string = "https://ms.jr.jd.com/gw/generic/uc/h5/m/";
 export const ACTION_HOST:string = "https://api.m.jd.com/client.action?";
 
-export const EXTENSION_VERSION: string = "0.0.7";
+export const EXTENSION_VERSION: string = "0.0.8";
 export const CONFIG_DATA_URL:string = "https://krapnik.cn/json/setting.json";
 
 export const DEFAULT_ACTIVITY_HOST:string = "https://wbbny.m.jd.com/";
-export const TRAVEL_URL:string = "babelDiy/Zeus/2vVU4E7JLH9gKYfLQ5EVW6eN2P7B/index.html";
+export const TRAVEL_URL:string = "babelDiy/Zeus/2fUope8TDN3dUJfNzQswkBLc7uE8/index.html";
 export const TRAVEL_INVITE:string = "?babelChannel=gjsyicon&shareType=taskHelp&inviteId=";
+export const TEAM_TRAVEL_INVITE:string = "?babelChannel=&shareType=team&inviteId=";
+
 
 //activity
 export const globalInfo = {
     environment: "other",//"jrApp",
-    eid: getEidJoint()['eid'],
+    // eid: getEidJoint()['eid'],
+    eid: "",
+    token:"",
     fp: getEidJoint()['fp'],
-    channelLv: "clv",
+    channelLv: "ttte",
     shareUuid: "uuid",
 };
 

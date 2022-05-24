@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Button, Card, Dropdown, Menu, message, PageHeader, Radio, Switch, Tooltip } from 'antd';
-import { QuestionCircleOutlined, UserOutlined, DownOutlined } from "@ant-design/icons";
+import { Button, Card, message, PageHeader } from 'antd';
+// import {  UserOutlined, DownOutlined } from "@ant-design/icons";
 import { localStoragePromise, openWindow } from '@src/utils';
 import { IAccount, IActivityResData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
@@ -45,6 +45,7 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                 ></PageHeader>
                 <Content>
                     <Card>
+                        <section>页面施工中👷</section>
                         <section className="setting-item">
                             <section className="operation">
                                 <Button type="primary" onClick={() => {
@@ -70,7 +71,7 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                                 {/* <Button type="primary">
                                     领取任务
                                 </Button> */}
-                                当前账号：<Dropdown overlay={() => {
+                                {/* 当前账号：<Dropdown overlay={() => {
                                     return (<Menu onClick={this.handleMenuClick.bind(this)}>
                                         {
                                             this.state.accountInfo.map((account,idx) => (
@@ -84,11 +85,11 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                                     <Button>
                                         全部账号 <DownOutlined />
                                     </Button>
-                                </Dropdown>
+                                </Dropdown> */}
                             </section>
                             <TextArea rows={10} value={this.state.log} />
                         </section>
-                        <section className="setting-item">
+                        {/* <section className="setting-item">
                             <p>
                                 开启后台任务：
                                 <Tooltip
@@ -122,7 +123,7 @@ export default class Goose extends React.Component<IProps, IState, {}> {
                                 <Radio value={1}>5</Radio>
                                 <Radio value={2}>10</Radio>
                             </Radio.Group>
-                        </section>
+                        </section> */}
                     </Card>
                 </Content>
             </section>
