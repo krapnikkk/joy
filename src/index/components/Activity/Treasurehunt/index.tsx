@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Button, Card, Divider, Dropdown, Menu, message, PageHeader, Radio, RadioChangeEvent, Switch, } from 'antd';
 import { UserOutlined, DownOutlined } from "@ant-design/icons";
-import { copyText, getRandom, injectCustomJs, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
+import { copyText, injectCustomJs, localStoragePromise, openWindow, rnd, sleep } from '@src/utils';
 import { IAccount, IActivityResData, IBaseResData, ILocalStorageData } from '@src/@types';
 import { Content } from 'antd/lib/layout/layout';
 import TextArea from 'antd/lib/input/TextArea';
 import { collectAtuoScore, collectScore, getBadgeAward, getFeedDetail, getHomeData, getTaskDetail, miMissions, raise, sign } from '@src/Activity';
 import { DateTime } from 'luxon';
-import { IAddProductVos, ICollectAtuoScore, ICollectScore, IMiMission, IMyAwardVos, IRaise, ISignRes, ITaskDetail, ITaskVos } from './typing';
+import { IAddProductVos, ICollectAtuoScore, ICollectScore, IMiMission, IMyAwardVos, ISignRes, ITaskDetail, ITaskVos } from './typing';
 import { DEFAULT_ACTIVITY_HOST, JDAPP_USER_AGENT, JDJRAPP_USER_AGENT, MINIPROGRAM_USER_AGENT, TRAVEL_INVITE, TRAVEL_URL } from '@src/constants';
 import { MenuInfo } from 'rc-menu/lib/interface';
 
