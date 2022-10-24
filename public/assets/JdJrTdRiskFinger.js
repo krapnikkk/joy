@@ -2158,10 +2158,10 @@ function getEidJoint() {
                 sto: t.sdkToken ? t.sdkToken : ""
             })
         } else
+            u = _jd_e_joint_,
             _jd_e_joint_.fp = risk_jd_local_fingerprint,
             _jd_e_joint_.token = jd_risk_token_id,
-            _jd_e_joint_.sto = td_collect.deviceInfo.sdkToken,
-            u = _jd_e_joint_
+            _jd_e_joint_.sto = td_collect.deviceInfo.sdkToken
     } catch (v) {}
     return u
 }

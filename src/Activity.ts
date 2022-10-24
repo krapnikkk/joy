@@ -309,6 +309,25 @@ export const raise = async (body:string,cookie?: string, userAgent: string = JDA
     return post(url, data, header);
 }
 
+export const followShop = async (body:string,cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
+    let functionId = "followShop";
+    let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";
+    let data = `functionId=${functionId}&client=m&clientVersion=-1&appid=signed_wh5&body=${body}`;
+    let url = `${ACTION_HOST}${api}=${functionId}`;
+    let args = userAgent == JDJRAPP_USER_AGENT ? { "X-Requested-With": "com.jd.jrapp" } : {};
+    let header = {
+        "User-Agent": userAgent,
+        "Referer": "https://wbbny.m.jd.com/",
+        "origin": "https://wbbny.m.jd.com/",
+        ...args,
+        cookie,
+        "Content-type": "application/x-www-form-urlencoded"
+    };
+    return post(url, data, header);
+}
+
+
+
 export const sign = async (body: string, cookie?: string, userAgent: string = JDAPP_USER_AGENT) => {
     let functionId = "promote_sign";
     let api = userAgent.indexOf(MINIPROGRAM_USER_AGENT) > -1 ? "dev" : "functionId";

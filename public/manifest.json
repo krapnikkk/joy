@@ -26,6 +26,7 @@
     "scripts": [
       "assets/aar2.min.js",
       "assets/JdJrTdRiskFinger.js",
+      "assets/smashUtils.js",
       "js/background.bundle.js"
     ],
     "persistent": true
