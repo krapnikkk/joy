@@ -101,12 +101,12 @@ export default class Treasurehunt extends React.Component<IProps, IState, {}> {
                                 </Button>
                             </section>
                             <section>
-                                <Button type="primary"
+                                {/* <Button type="primary"
                                     onClick={() => {
                                         this.raise();
                                     }}>
                                     查看账号信息
-                                </Button>
+                                </Button> */}
                                 <Button type="primary"
                                     onClick={() => {
                                         this.raise();
@@ -354,7 +354,7 @@ export default class Treasurehunt extends React.Component<IProps, IState, {}> {
             let currentAccount = account.curPin;
             await this.setStateAsync({ currentAccount });
             let { cookie } = this.state.accountMap[currentAccount];
-            let body = await this.getSourceRes(cookie);
+            let body = await this.getSourceRes(cookie,{"scenceId":1});
             let res = await raise(body, cookie) as IBaseResData;
             let { success } = res.data;
             let log = "";
